@@ -3,6 +3,10 @@
 var express = require('express');
 var app = express();
 
+var priceObjects = [];
+
+app.use(express.static(__dirname + '/public'));
+
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
@@ -18,5 +22,17 @@ app.get('/about', function(req, res) {
     res.render('pages/about');
 });
 
+// objects index page 
+app.get('/objects', function(req, res) {
+    res.render('pages/objects/index', {
+        priceObjects: priceObjects
+    });
+});
+
+// objects create page 
+app.get('/objects/create', function(req, res) {
+    res.render('pages/objects/create');
+});
+
 app.listen(8080);
-console.log('8080 is the magic port');
+console.log('Application started on 8080 port');

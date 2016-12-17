@@ -1,0 +1,145 @@
+body {
+    padding-top: 50px;
+}
+
+
+/* Grid Table styles */
+
+.grid-table {
+    margin: 10px;
+    width: 100%;
+}
+
+.grid-table th {
+    border-bottom: 2px solid #ddd;
+    color: #666;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.grid-table th,
+.grid-table td {
+    padding: 5px 0;
+}
+
+.grid-table tr:nth-child(even) {
+    background: none;
+}
+
+.grid-table tr:nth-child(odd) {
+    background: #f5f5f5;
+}
+
+.grid-table tr:first-child,
+.grid-table tr:first-child:hover {
+    background: none;
+}
+
+.grid-table tr:hover {
+    background: #eee;
+}
+
+
+/* Commands styles */
+
+.commands-div {
+    padding: 5px;
+}
+
+.command-button {
+    color: #159;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+}
+
+.command-button:hover {
+    background: #f8f8f8;
+    text-decoration: none;
+}
+
+
+/* Navigations styles */
+
+.navigation-button {
+    color: #159;
+    font-weight: bold;
+    text-decoration: none;
+    border: none;
+    padding: 5px 10px;
+}
+
+.navigation-button:hover {
+    color: #37a;
+    text-decoration: none;
+}
+
+
+/* Buttons styles */
+
+.submit-button {
+    background: #18e;
+    color: white;
+    text-decoration: none;
+    border: 1px solid #16d;
+    width: 150px;
+    padding: 5px 10px;
+    font-weight: bold;
+}
+
+.submit-button:hover {
+    background: #29e;
+    text-decoration: none;
+    color: white;
+}
+
+.submit-button:active {
+    background: #3ae;
+}
+
+
+/* Form styles */
+
+.form-div {
+    border: 1px solid #ddd;
+    width: 50%;
+    margin: 15px auto;
+}
+
+.form-div label {
+    width: 100%;
+    color: #558;
+    margin-top: 15px;
+}
+
+.form-div input,
+.form-div textarea {
+    width: 100%;
+    height: 30px;
+    border: 1px solid #5ae;
+}
+
+.form-div input:hover,
+.form-div textarea:hover {
+    border: 1px solid #39d;
+}
+
+.form-div input:active,
+.form-div textarea:active {
+    border: 1px solid #18a;
+}
+
+.form-div textarea {
+    resize: vertical;
+    height: 200px;
+}
+
+.form-body-div {
+    padding: 10px;
+}
+
+.form-commands-div {
+    text-align: center;
+    padding: 10px;
+    background: #f3f3f3;
+}

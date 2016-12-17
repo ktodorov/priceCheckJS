@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<% include ../../partials/head %>
+</head>
+<body class="container">
+
+	<header>
+		<% include ../../partials/header %>
+	</header>
+
+	<main>
+        <div class='page-header'>
+            Add new price check object
+        </div>
+
+        <a class='navigation-button' href='/objects'>
+        Go back to all objects
+        </a>
+
+        <div class='form-div'>
+            <div class='form-body-div'>
+                <label for='object-url'>Object URL</label> 
+                <input id='object-url' type='text' />
+                
+                <label for='object-name'>Object name</label> 
+                <input id='object-name' type='text' />
+                
+                <label for='object-description'>Description</label> 
+                <textarea id='object-description'></textarea>
+            </div>
+
+            <div class='form-commands-div'>
+                <button class='submit-button'>Create</button>
+            </div>
+        </div>
+	</main>
+
+	<footer>
+		<% include ../../partials/footer %>
+	</footer>
+	
+</body>
+</html>
