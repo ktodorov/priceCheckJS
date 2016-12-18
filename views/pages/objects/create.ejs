@@ -19,20 +19,24 @@
         </a>
 
         <div class='form-div'>
-            <div class='form-body-div'>
-                <label for='object-url'>Object URL</label> 
-                <input id='object-url' type='text' />
-                
-                <label for='object-name'>Object name</label> 
-                <input id='object-name' type='text' />
-                
-                <label for='object-description'>Description</label> 
-                <textarea id='object-description'></textarea>
-            </div>
+            <form name='addPriceObject' method="post" action="/objects/create">
+                <fieldset>
+                    <div class='form-body-div'>
+                        <label for='objectUrl'>Object URL</label> 
+                        <input id='objectUrl' name='objectUrl' type='text' />
+                        
+                        <label for='objectName'>Object name</label> 
+                        <input id='objectName' name='objectName' type='text' />
+                        
+                        <label for='objectDescription'>Description</label> 
+                        <textarea id='objectDescription' name='objectDescription'></textarea>
+                    </div>
 
-            <div class='form-commands-div'>
-                <button class='submit-button'>Create</button>
-            </div>
+                    <div class='form-commands-div'>
+                        <button type='submit' class='submit-button'>Create</button>
+                    </div>
+                </fieldset>
+            </form>
         </div>
 	</main>
 

@@ -31,11 +31,22 @@
                     New price
                 </th>
                 <th>
+                    Difference
+                </th>
+                <th>
                     Website
                 </th>
             </tr>
-            <% if (priceObjects && priceObjects.length > 0) { %>
-                // TODO: Add connection to database
+            <% if (objectslist && objectslist.length > 0) { %>
+                <% for(var i=0; i < objectslist.length; i++) { %>
+                    <tr>
+                        <td><%= objectslist[i].name %></td>
+                        <td><%= objectslist[i].oldPrice %></td>
+                        <td><%= objectslist[i].newPrice %></td>
+                        <td><%= objectslist[i].newPrice - objectslist[i].oldPrice %></td>
+                        <td><a href='<%= objectslist[i].objectUrl %>'>Link</a></td>
+                    </tr>
+                <% } %>
             <% } else { %>
                 <tr>
                     <td colspan='4'> 
