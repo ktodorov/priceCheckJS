@@ -10,6 +10,11 @@ body {
     width: 100%;
 }
 
+.grid-table td {
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+}
+
 .grid-table th {
     border-bottom: 2px solid #ddd;
     color: #666;
@@ -26,17 +31,13 @@ body {
     background: none;
 }
 
-.grid-table tr:nth-child(odd) {
-    background: #f5f5f5;
-}
-
 .grid-table tr:first-child,
 .grid-table tr:first-child:hover {
     background: none;
 }
 
-.grid-table tr:hover {
-    background: #eee;
+.grid-table img {
+    max-width: 150px;
 }
 
 
@@ -102,7 +103,7 @@ body {
 
 .form-div {
     border: 1px solid #ddd;
-    width: 50%;
+    width: 60%;
     margin: 15px auto;
 }
 
@@ -113,19 +114,22 @@ body {
 }
 
 .form-div input,
-.form-div textarea {
+.form-div textarea,
+.form-div select {
     width: 100%;
     height: 30px;
     border: 1px solid #5ae;
 }
 
 .form-div input:hover,
-.form-div textarea:hover {
+.form-div textarea:hover,
+.form-div select:hover {
     border: 1px solid #39d;
 }
 
 .form-div input:active,
-.form-div textarea:active {
+.form-div textarea:active,
+.form-div select:active {
     border: 1px solid #18a;
 }
 
@@ -142,4 +146,17 @@ body {
     text-align: center;
     padding: 10px;
     background: #f3f3f3;
+}
+
+.form-div input[disabled='disabled'] {
+    background: #f5f5f5;
+}
+
+.form-div .invisible {
+    display: none;
+}
+
+#loading-div {
+    padding: 10px;
+    text-align: center;
 }

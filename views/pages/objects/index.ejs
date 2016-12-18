@@ -22,6 +22,9 @@
         <table class='grid-table'>
             <tr>
                 <th>
+                    Image
+                </th>
+                <th>
                     Name
                 </th>
                 <th>
@@ -40,16 +43,17 @@
             <% if (objectslist && objectslist.length > 0) { %>
                 <% for(var i=0; i < objectslist.length; i++) { %>
                     <tr>
+                        <td style='text-align: center;'><img src='<%= objectslist[i].imageUrl %>' alt='objectslist[i].name '/></td>
                         <td><%= objectslist[i].name %></td>
                         <td><%= objectslist[i].oldPrice %></td>
                         <td><%= objectslist[i].newPrice %></td>
                         <td><%= objectslist[i].newPrice - objectslist[i].oldPrice %></td>
-                        <td><a href='<%= objectslist[i].objectUrl %>'>Link</a></td>
+                        <td><a href='<%= objectslist[i].objectUrl %>'><%= objectslist[i].website %></a></td>
                     </tr>
                 <% } %>
             <% } else { %>
                 <tr>
-                    <td colspan='4'> 
+                    <td colspan='6'> 
                         No data
                     </td>
                 </tr>

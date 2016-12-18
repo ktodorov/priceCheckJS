@@ -7,13 +7,16 @@ var bodyParser = require('body-parser');
 var mongo = require('mongodb');
 var monk = require('monk');
 var db = monk('localhost:27017/priceCheckDb');
+// To start MongoDB:
+// mongod --dbpath e:\OneDrive\University\Year4\JavascriptAdvanced\priceCheckJS\data\ 
 
-var priceObjects = [];
+require('babel-core/register');
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
 app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/images'));
 
 // Make our db accessible to our router
 app.use(function(req, res, next) {
@@ -64,13 +67,18 @@ app.post('/objects/create', function(req, res) {
     var objectName = req.body.objectName;
     var objectUrl = req.body.objectUrl;
     var objectDescription = req.body.objectDescription;
-    var objectOldPrice = 150;
-    var objectNewPrice = 100;
-    console.log('objectName = ' + objectName);
-    console.log('objectUrl = ' + objectUrl);
-    console.log('objectDescription = ' + objectDescription);
-    console.log('objectOldPrice = ' + objectOldPrice);
-    console.log('objectNewPrice = ' + objectNewPrice);
+    var objectOldPrice = req.body.objectPrice;
+    var objectNewPrice = req.body.objectPrice;
+    var objectImageUrl = req.body.imageUrl;
+    var objectWebsite = req.body.website;
+
+    // console.log('objectName = ' + objectName);
+    // console.log('objectUrl = ' + objectUrl);
+    // console.log('objectDescription = ' + objectDescription);
+    // console.log('objectOldPrice = ' + objectOldPrice);
+    // console.log('objectNewPrice = ' + objectNewPrice);
+    // console.log('objectImageUrl = ' + objectImageUrl);
+    // console.log('objectWebsite = ' + objectWebsite);
 
     // Set our collection
     var collection = db.get('priceCheckObjectsCollection');
@@ -82,6 +90,8 @@ app.post('/objects/create', function(req, res) {
         "oldPrice": objectOldPrice,
         "newPrice": objectNewPrice,
         "description": objectDescription,
+        "imageUrl": objectImageUrl,
+        "website": objectWebsite
     }, function(err, doc) {
         if (err) {
             // If it failed, return error
