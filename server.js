@@ -12,6 +12,15 @@ var db = monk('localhost:27017/priceCheckDb');
 
 require('babel-core/register');
 
+var jsdom = require("jsdom").jsdom;
+var doc = jsdom();
+window = doc.defaultView;
+
+// Load jQuery with the simulated jsdom window.
+$ = jQuery = require('jquery');
+
+var analyzers = require("./public/scripts/analyzers.js");
+
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
@@ -45,11 +54,33 @@ app.get('/objects', function(req, res) {
     var db = req.db;
     var collection = db.get('priceCheckObjectsCollection');
     collection.find({}, {}, function(e, docs) {
+        for (var i = 0; i < docs.length; i++) {
+            var analyzer = analyzers.getAnalyzerFromUrl(docs[i].objectUrl);
+            var website = analyzers.getWebsiteFromUrl(docs[i].objectUrl);
+
+            docs[i].website = website;
+
+            try {
+                $.when(analyzer.getImageUrl())
+                    .then(function(imageUrl) {
+                        docs[i].imageUrl = imageUrl;
+                    })
+                    .catch(err => {
+                        console.log("error occured: ", err);
+                    })
+                    .bind(this);
+            } catch (e) {
+
+            }
+        }
+
         res.render('pages/objects/index', {
             "objectslist": docs
         });
     });
 });
+
+
 
 // objects create page 
 app.get('/objects/create', function(req, res) {
