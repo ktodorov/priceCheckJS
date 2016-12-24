@@ -11,6 +11,9 @@ if (is_server()) {
     var coreLibrary = require("./core.js");
     var getWebsiteFromUrl = coreLibrary.getWebsiteFromUrl;
     var getNumberFromString = coreLibrary.getNumberFromString;
+
+    var websitesLibrary = require("./websites.js");
+    var Websites = websitesLibrary.Websites;
 }
 
 // $.ajaxPrefilter(function(options) {
@@ -186,8 +189,68 @@ EbayAnalyzer.prototype.getImageUrl = function() {
     });
 };
 
+
+// Technopolis analyzer class
+
+function TechnopolisAnalyzer(url) {
+    BaseAnalyzer.call(this, url);
+}
+
+TechnopolisAnalyzer.prototype = Object.create(BaseAnalyzer.prototype);
+
+TechnopolisAnalyzer.prototype.getPrice = function() {
+    this.currency = Currencies.BGN;
+
+    return new Promise((resolve, reject) => {
+        this.getHtmlFromUrl().then(function(html) {
+            var $html = $(html);
+            var priceNodes = $html.find(".priceValue");
+            var priceNode = priceNodes.first();
+            var priceNodeText = priceNode.html().trim();
+            var mainPrice = parseInt(getNumberFromString(priceNodeText.split("<span")[0]));
+            var subPrice = parseInt(priceNode.find("sup").text().trim());
+            var fullPrice = mainPrice + (subPrice / 100);
+            resolve(fullPrice);
+        });
+    });
+}
+
+TechnopolisAnalyzer.prototype.getName = function() {
+    return new Promise((resolve, reject) => {
+        this.getHtmlFromUrl().then(function(html) {
+            var $html = $(html);
+            var productNameHeader = $html.find("section.product h1");
+            if (!productNameHeader) {
+                reject("Product name header not found");
+            }
+            var productName = unescape(productNameHeader.text());
+            resolve(productName);
+        });
+    });
+}
+
+TechnopolisAnalyzer.prototype.getImageUrl = function() {
+    return new Promise((resolve, reject) => {
+        this.getHtmlFromUrl()
+            .then(html => {
+                var $html = $(html);
+                debugger;
+                var image = $html.find("div.product-preview img");
+                if (!image) {
+                    reject(null);
+                }
+                var imgSource = "http://www." + Websites.Technopolis + image.attr('src');
+                resolve(imgSource);
+            })
+            .catch(err => {
+                console.log("error occured: ", err);
+            });
+    });
+};
+
 (function(exports) {
     exports.BaseAnalyzer = BaseAnalyzer;
     exports.EmagAnalyzer = EmagAnalyzer;
     exports.EbayAnalyzer = EbayAnalyzer;
+    exports.TechnopolisAnalyzer = TechnopolisAnalyzer;
 })(typeof exports === 'undefined' ? this['mymodule'] = {} : exports);

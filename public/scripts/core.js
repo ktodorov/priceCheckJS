@@ -40,7 +40,8 @@ function getWebsiteFromUrl(urlString, includeFamilyWebsites) {
 }
 
 function getNumberFromString(sentence) {
-    var matches = sentence.replace(/,/g, '').match(/(\+|-)?((\d+(\.\d+)?)|(\.\d+))/);
+    var sentenceWithoutSpaces = sentence.replace(/\s/g, '');
+    var matches = sentenceWithoutSpaces.replace(/,/g, '').match(/(\+|-)?((\d+(\.\d+)?)|(\.\d+))/);
     return matches && matches[0] || null;
 }
 

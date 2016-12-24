@@ -5,7 +5,8 @@ Websites = {
     AmazonCoUk: "amazon.co.uk",
     Ebay: "ebay",
     EbayCom: "ebay.com",
-    EbayCoUk: "ebay.co.uk"
+    EbayCoUk: "ebay.co.uk",
+    Technopolis: "technopolis.bg"
 };
 
 (function(exports) {

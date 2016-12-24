@@ -65,14 +65,13 @@ app.get('/objects', function(req, res) {
                 docs[i].website = website;
                 docs[i].currency = currency;
 
-                $.when(analyzer.getImageUrl())
+                analyzer.getImageUrl()
                     .then(function(imageUrl) {
                         docs[i].imageUrl = imageUrl;
                     })
                     .catch(err => {
                         console.log("error occured: ", err);
-                    })
-                    .bind(this);
+                    });
             } catch (e) {
                 console.log("error occured: ", e);
             }

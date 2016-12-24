@@ -7,6 +7,7 @@ if (is_server()) {
     var BaseAnalyzer = websiteAnalyzers.BaseAnalyzer;
     var EmagAnalyzer = websiteAnalyzers.EmagAnalyzer;
     var EbayAnalyzer = websiteAnalyzers.EbayAnalyzer;
+    var TechnopolisAnalyzer = websiteAnalyzers.TechnopolisAnalyzer;
 
     var currenciesLibrary = require("./currencies.js");
     var Currencies = currenciesLibrary.Currencies;
@@ -72,10 +73,12 @@ function getAnalyzerFromUrl(urlString) {
     var website = getWebsiteFromUrl(urlString);
     var analyzer = null;
 
-    if (website == "emag.bg") {
+    if (website == Websites.Emag) {
         analyzer = new EmagAnalyzer(urlString);
-    } else if (website == "ebay") {
+    } else if (website == Websites.Ebay) {
         analyzer = new EbayAnalyzer(urlString);
+    } else if (website == Websites.Technopolis) {
+        analyzer = new TechnopolisAnalyzer(urlString);
     }
 
     return analyzer;
