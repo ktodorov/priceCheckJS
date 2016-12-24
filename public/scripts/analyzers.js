@@ -6,12 +6,18 @@ if (is_server()) {
     var websiteAnalyzers = require("./websiteAnalyzers.js");
     var BaseAnalyzer = websiteAnalyzers.BaseAnalyzer;
     var EmagAnalyzer = websiteAnalyzers.EmagAnalyzer;
-    var EbayCoUkAnalyzer = websiteAnalyzers.EbayCoUkAnalyzer;
+    var EbayAnalyzer = websiteAnalyzers.EbayAnalyzer;
 
     var currenciesLibrary = require("./currencies.js");
     var Currencies = currenciesLibrary.Currencies;
     var CurrencySymbols = currenciesLibrary.CurrencySymbols;
     var getCurrencySymbol = currenciesLibrary.getCurrencySymbol;
+
+    var coreLibrary = require("./core.js");
+    var getWebsiteFromUrl = coreLibrary.getWebsiteFromUrl;
+
+    var websitesLibrary = require("./websites.js");
+    var Websites = websitesLibrary.Websites;
 }
 
 function analyzeObject() {
@@ -66,10 +72,10 @@ function getAnalyzerFromUrl(urlString) {
     var website = getWebsiteFromUrl(urlString);
     var analyzer = null;
 
-    if (website == "emag") {
+    if (website == "emag.bg") {
         analyzer = new EmagAnalyzer(urlString);
-    } else if (website == "ebay.co.uk") {
-        analyzer = new EbayCoUkAnalyzer(urlString);
+    } else if (website == "ebay") {
+        analyzer = new EbayAnalyzer(urlString);
     }
 
     return analyzer;
@@ -89,38 +95,7 @@ function getImageFromUrl(urlString) {
     })
 }
 
-function getWebsiteFromUrl(urlString) {
-    var hostnames = urlString.match(/^http:\/\/[^/]+/);
-    if (!hostnames || hostnames.length == 0) {
-        hostnames = urlString.match(/^https:\/\/[^/]+/);
-        if (!hostnames || hostnames.length == 0) {
-            return "";
-        }
-    }
-    var hostname = hostnames[0];
-    if (!hostname) {
-        return "";
-    }
-
-    if (hostname.indexOf("emag.bg") != -1) {
-        return "emag";
-    } else if (hostname.indexOf("amazon.com") != -1) {
-        return "amazon.com";
-    } else if (hostname.indexOf("amazon.co.uk") != -1) {
-        return "amazon.co.uk";
-    } else if (hostname.indexOf("technomarket") != -1) {
-        return "technomarket";
-    } else if (hostname.indexOf("technopolis") != -1) {
-        return "technopolis";
-    } else if (hostname.indexOf("ebay.co.uk") != -1) {
-        return "ebay.co.uk";
-    }
-
-    return "";
-}
-
 (function(exports) {
     exports.getAnalyzerFromUrl = getAnalyzerFromUrl;
-    exports.getWebsiteFromUrl = getWebsiteFromUrl;
     exports.getImageFromUrl = getImageFromUrl;
 })(typeof exports === 'undefined' ? this['mymodule'] = {} : exports);

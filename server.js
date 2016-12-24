@@ -19,6 +19,7 @@ window = doc.defaultView;
 // Load jQuery with the simulated jsdom window.
 $ = jQuery = require('jquery');
 
+var core = require("./public/scripts/core.js");
 var analyzers = require("./public/scripts/analyzers.js");
 var currencies = require("./public/scripts/currencies.js");
 
@@ -56,14 +57,14 @@ app.get('/objects', function(req, res) {
     var collection = db.get('priceCheckObjectsCollection');
     collection.find({}, {}, function(e, docs) {
         for (var i = 0; i < docs.length; i++) {
-            var analyzer = analyzers.getAnalyzerFromUrl(docs[i].objectUrl);
-            var website = analyzers.getWebsiteFromUrl(docs[i].objectUrl);
-            var currency = currencies.getCurrencySymbol(docs[i].currency);
-
-            docs[i].website = website;
-            docs[i].currency = currency;
-
             try {
+                var website = core.getWebsiteFromUrl(docs[i].objectUrl, false);
+                var analyzer = analyzers.getAnalyzerFromUrl(docs[i].objectUrl);
+                var currency = currencies.getCurrencySymbol(docs[i].currency);
+
+                docs[i].website = website;
+                docs[i].currency = currency;
+
                 $.when(analyzer.getImageUrl())
                     .then(function(imageUrl) {
                         docs[i].imageUrl = imageUrl;
@@ -73,7 +74,7 @@ app.get('/objects', function(req, res) {
                     })
                     .bind(this);
             } catch (e) {
-
+                console.log("error occured: ", e);
             }
         }
 

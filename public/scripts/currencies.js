@@ -1,3 +1,12 @@
+function is_server() {
+    return (typeof process === 'object' && process + '' === '[object process]');
+}
+
+if (is_server()) {
+    var websitesLibrary = require("./websites.js");
+    var Websites = websitesLibrary.Websites;
+}
+
 Currencies = {
     BGN: 0,
     USD: 1,
@@ -22,8 +31,24 @@ function getCurrencySymbol(currency) {
     return "";
 }
 
+function getCurrencyFromWebsite(website) {
+    switch (website) {
+        case Websites.EbayCoUk:
+            return Currencies.GBP;
+        case Websites.EbayCom:
+            return Currencies.USD;
+        case Websites.AmazonCoUk:
+            return Currencies.GBP;
+        case Websites.AmazonCom:
+            return Currencies.USD;
+    }
+
+    return Currencies.BGN;
+}
+
 (function(exports) {
     exports.Currencies = Currencies;
     exports.CurrencySymbols = CurrencySymbols;
     exports.getCurrencySymbol = getCurrencySymbol;
+    exports.getCurrencyFromWebsite = getCurrencyFromWebsite;
 })(typeof exports === 'undefined' ? this['mymodule'] = {} : exports);

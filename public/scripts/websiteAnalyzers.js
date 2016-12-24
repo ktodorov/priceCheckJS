@@ -6,6 +6,11 @@ if (is_server()) {
     var currenciesLibrary = require("./currencies.js");
     var Currencies = currenciesLibrary.Currencies;
     var CurrencySymbols = currenciesLibrary.CurrencySymbols;
+    var getCurrencyFromWebsite = currenciesLibrary.getCurrencyFromWebsite;
+
+    var coreLibrary = require("./core.js");
+    var getWebsiteFromUrl = coreLibrary.getWebsiteFromUrl;
+    var getNumberFromString = coreLibrary.getNumberFromString;
 }
 
 // $.ajaxPrefilter(function(options) {
@@ -79,7 +84,6 @@ function EmagAnalyzer(url) {
 EmagAnalyzer.prototype = Object.create(BaseAnalyzer.prototype);
 
 EmagAnalyzer.prototype.getPrice = function() {
-    debugger;
     this.currency = Currencies.BGN;
 
     return new Promise((resolve, reject) => {
@@ -127,30 +131,30 @@ EmagAnalyzer.prototype.getImageUrl = function() {
 };
 
 
-// Amazon.co.uk analyzer class
+// Ebay analyzer class
 
-function EbayCoUkAnalyzer(url) {
+function EbayAnalyzer(url) {
     BaseAnalyzer.call(this, url);
+    this.website = getWebsiteFromUrl(url, false);
 }
 
-EbayCoUkAnalyzer.prototype = Object.create(BaseAnalyzer.prototype);
+EbayAnalyzer.prototype = Object.create(BaseAnalyzer.prototype);
 
-EbayCoUkAnalyzer.prototype.getPrice = function() {
-    debugger;
-    this.currency = Currencies.GBP;
+EbayAnalyzer.prototype.getPrice = function() {
+    this.currency = getCurrencyFromWebsite(this.website);
 
     return new Promise((resolve, reject) => {
         this.getHtmlFromUrl().then(function(html) {
             var $html = $(html);
             var priceNodes = $html.find("#prcIsum");
-            var priceNode = priceNodes.attr('content').trim();
-            var fullPrice = parseFloat(priceNode);
+            var priceNode = priceNodes.html().trim();
+            var fullPrice = getNumberFromString(priceNode);
             resolve(fullPrice);
         });
     });
 }
 
-EbayCoUkAnalyzer.prototype.getName = function() {
+EbayAnalyzer.prototype.getName = function() {
     return new Promise((resolve, reject) => {
         this.getHtmlFromUrl().then(function(html) {
             var $html = $(html);
@@ -164,7 +168,7 @@ EbayCoUkAnalyzer.prototype.getName = function() {
     });
 }
 
-EbayCoUkAnalyzer.prototype.getImageUrl = function() {
+EbayAnalyzer.prototype.getImageUrl = function() {
     return new Promise((resolve, reject) => {
         this.getHtmlFromUrl()
             .then(html => {
@@ -185,5 +189,5 @@ EbayCoUkAnalyzer.prototype.getImageUrl = function() {
 (function(exports) {
     exports.BaseAnalyzer = BaseAnalyzer;
     exports.EmagAnalyzer = EmagAnalyzer;
-    exports.EbayCoUkAnalyzer = EbayCoUkAnalyzer;
+    exports.EbayAnalyzer = EbayAnalyzer;
 })(typeof exports === 'undefined' ? this['mymodule'] = {} : exports);
