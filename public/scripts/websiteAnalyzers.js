@@ -5,6 +5,18 @@
 //     }
 // });
 
+function htmlEncode(value) {
+    //create a in-memory div, set it's inner text(which jQuery automatically encodes)
+    //then grab the encoded contents back out.  The div never exists on the page.
+    return $('<div/>').text(value).html();
+}
+
+function htmlDecode(value) {
+    return $('<div/>').html(value).text();
+}
+
+// Analyzer base class
+
 function BaseAnalyzer(url) {
     this.url = url;
     this.htmlFromUrl = null;
@@ -28,6 +40,7 @@ BaseAnalyzer.prototype.getImageUrl = function() {
 
 BaseAnalyzer.prototype.getHtmlFromUrl = function() {
     return new Promise((resolve, reject) => {
+        debugger;
         if (this.htmlFromUrl) {
             resolve(this.htmlFromUrl);
         } else {
@@ -36,6 +49,7 @@ BaseAnalyzer.prototype.getHtmlFromUrl = function() {
                 crossDomain: true,
                 type: "GET",
                 success: function(data) {
+                    debugger;
                     this.htmlFromUrl = data.responseText;
                     resolve(data.responseText);
                 },
@@ -46,6 +60,9 @@ BaseAnalyzer.prototype.getHtmlFromUrl = function() {
         }
     });
 }
+
+
+// Emag.bg analyzer class
 
 function EmagAnalyzer(url) {
     BaseAnalyzer.call(this, url);
@@ -72,10 +89,9 @@ EmagAnalyzer.prototype.getPrice = function() {
 EmagAnalyzer.prototype.getName = function() {
     return new Promise((resolve, reject) => {
         this.getHtmlFromUrl().then(function(html) {
-            var div = document.createElement("div");
-            div.innerHTML = html;
-            var nameNodes = div.getElementsByClassName("page-title");
-            var name = nameNodes[0].innerHTML.trim();
+            var $html = $(html);
+            var nameNodes = $html.find(".page-title");
+            var name = nameNodes.html().trim();
             resolve(name);
         });
     });
@@ -99,7 +115,61 @@ EmagAnalyzer.prototype.getImageUrl = function() {
     });
 };
 
+
+// Amazon.co.uk analyzer class
+
+function EbayCoUkAnalyzer(url) {
+    BaseAnalyzer.call(this, url);
+}
+
+EbayCoUkAnalyzer.prototype = Object.create(BaseAnalyzer.prototype);
+
+EbayCoUkAnalyzer.prototype.getPrice = function() {
+    return new Promise((resolve, reject) => {
+        this.getHtmlFromUrl().then(function(html) {
+            var $html = $(html);
+            var priceNodes = $html.find("#prcIsum");
+            var priceNode = priceNodes.attr('content').trim();
+            var fullPrice = parseFloat(priceNode);
+            resolve(fullPrice);
+        });
+    });
+}
+
+EbayCoUkAnalyzer.prototype.getName = function() {
+    return new Promise((resolve, reject) => {
+        this.getHtmlFromUrl().then(function(html) {
+            var $html = $(html);
+            var productNameSpan = $html.find("#itemTitle");
+            if (!productNameSpan) {
+                reject("Product name span not found");
+            }
+            var productName = unescape(productNameSpan.html().split("</span>")[1]);
+            resolve(productName);
+        });
+    });
+}
+
+EbayCoUkAnalyzer.prototype.getImageUrl = function() {
+    return new Promise((resolve, reject) => {
+        this.getHtmlFromUrl()
+            .then(html => {
+                var $html = $(html);
+                var image = $html.find("#icImg");
+                if (!image) {
+                    reject(null);
+                }
+                var imgSource = image.attr('src');
+                resolve(imgSource);
+            })
+            .catch(err => {
+                console.log("error occured: ", err);
+            });
+    });
+};
+
 (function(exports) {
     exports.BaseAnalyzer = BaseAnalyzer;
     exports.EmagAnalyzer = EmagAnalyzer;
+    exports.EbayCoUkAnalyzer = EbayCoUkAnalyzer;
 })(typeof exports === 'undefined' ? this['mymodule'] = {} : exports);

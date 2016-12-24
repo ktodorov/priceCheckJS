@@ -6,9 +6,11 @@ if (is_server()) {
     var websiteAnalyzers = require("./websiteAnalyzers.js");
     var BaseAnalyzer = websiteAnalyzers.BaseAnalyzer;
     var EmagAnalyzer = websiteAnalyzers.EmagAnalyzer;
+    var EbayCoUkAnalyzer = websiteAnalyzers.EbayCoUkAnalyzer;
 }
 
 function analyzeObject() {
+    debugger;
     var url = $("#objectUrl").val();
     var website = getWebsiteFromUrl(url);
 
@@ -57,6 +59,8 @@ function getAnalyzerFromUrl(urlString) {
 
     if (website == "emag") {
         analyzer = new EmagAnalyzer(urlString);
+    } else if (website == "ebay.co.uk") {
+        analyzer = new EbayCoUkAnalyzer(urlString);
     }
 
     return analyzer;
@@ -77,7 +81,14 @@ function getImageFromUrl(urlString) {
 }
 
 function getWebsiteFromUrl(urlString) {
-    var hostname = urlString.match(/^http:\/\/[^/]+/)[0];
+    var hostnames = urlString.match(/^http:\/\/[^/]+/);
+    if (!hostnames || hostnames.length == 0) {
+        hostnames = urlString.match(/^https:\/\/[^/]+/);
+        if (!hostnames || hostnames.length == 0) {
+            return "";
+        }
+    }
+    var hostname = hostnames[0];
     if (!hostname) {
         return "";
     }
@@ -92,6 +103,8 @@ function getWebsiteFromUrl(urlString) {
         return "technomarket";
     } else if (hostname.indexOf("technopolis") != -1) {
         return "technopolis";
+    } else if (hostname.indexOf("ebay.co.uk") != -1) {
+        return "ebay.co.uk";
     }
 
     return "";
