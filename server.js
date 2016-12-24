@@ -20,6 +20,7 @@ window = doc.defaultView;
 $ = jQuery = require('jquery');
 
 var analyzers = require("./public/scripts/analyzers.js");
+var currencies = require("./public/scripts/currencies.js");
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -57,8 +58,10 @@ app.get('/objects', function(req, res) {
         for (var i = 0; i < docs.length; i++) {
             var analyzer = analyzers.getAnalyzerFromUrl(docs[i].objectUrl);
             var website = analyzers.getWebsiteFromUrl(docs[i].objectUrl);
+            var currency = currencies.getCurrencySymbol(docs[i].currency);
 
             docs[i].website = website;
+            docs[i].currency = currency;
 
             try {
                 $.when(analyzer.getImageUrl())
@@ -102,7 +105,7 @@ app.post('/objects/create', function(req, res) {
     var objectNewPrice = req.body.objectPrice;
     var objectImageUrl = req.body.imageUrl;
     var objectWebsite = req.body.website;
-
+    var objectCurrency = req.body.objectCurrency;
     // console.log('objectName = ' + objectName);
     // console.log('objectUrl = ' + objectUrl);
     // console.log('objectDescription = ' + objectDescription);
@@ -122,7 +125,8 @@ app.post('/objects/create', function(req, res) {
         "newPrice": objectNewPrice,
         "description": objectDescription,
         "imageUrl": objectImageUrl,
-        "website": objectWebsite
+        "website": objectWebsite,
+        "currency": objectCurrency
     }, function(err, doc) {
         if (err) {
             // If it failed, return error

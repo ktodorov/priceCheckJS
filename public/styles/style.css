@@ -25,6 +25,12 @@ body {
 .grid-table th,
 .grid-table td {
     padding: 5px 0;
+    text-align: center;
+}
+
+.grid-table th.left-aligned,
+.grid-table td.left-aligned {
+    text-align: left;
 }
 
 .grid-table tr:nth-child(even) {

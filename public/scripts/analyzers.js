@@ -7,6 +7,11 @@ if (is_server()) {
     var BaseAnalyzer = websiteAnalyzers.BaseAnalyzer;
     var EmagAnalyzer = websiteAnalyzers.EmagAnalyzer;
     var EbayCoUkAnalyzer = websiteAnalyzers.EbayCoUkAnalyzer;
+
+    var currenciesLibrary = require("./currencies.js");
+    var Currencies = currenciesLibrary.Currencies;
+    var CurrencySymbols = currenciesLibrary.CurrencySymbols;
+    var getCurrencySymbol = currenciesLibrary.getCurrencySymbol;
 }
 
 function analyzeObject() {
@@ -29,6 +34,10 @@ function analyzeObject() {
                 analyzer.htmlFromUrl = html;
                 analyzer.getPrice().then(function(price) {
                     $("#objectPrice").val(price);
+                    var objectCurrency = analyzer.currency;
+                    var objectCurrencySymbol = getCurrencySymbol(objectCurrency);
+                    $("#objectCurrency").val(objectCurrency);
+                    $("#objectCurrencySymbol").val(objectCurrencySymbol);
 
                     analyzer.getName().then(function(name) {
                         $("#objectName").val(name);

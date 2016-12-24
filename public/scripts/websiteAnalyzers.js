@@ -1,3 +1,13 @@
+function is_server() {
+    return (typeof process === 'object' && process + '' === '[object process]');
+}
+
+if (is_server()) {
+    var currenciesLibrary = require("./currencies.js");
+    var Currencies = currenciesLibrary.Currencies;
+    var CurrencySymbols = currenciesLibrary.CurrencySymbols;
+}
+
 // $.ajaxPrefilter(function(options) {
 //     if (options.crossDomain && jQuery.support.cors) {
 //         var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
@@ -20,6 +30,7 @@ function htmlDecode(value) {
 function BaseAnalyzer(url) {
     this.url = url;
     this.htmlFromUrl = null;
+    this.currency = "";
 }
 
 BaseAnalyzer.prototype.getUrl = function() {
@@ -40,7 +51,6 @@ BaseAnalyzer.prototype.getImageUrl = function() {
 
 BaseAnalyzer.prototype.getHtmlFromUrl = function() {
     return new Promise((resolve, reject) => {
-        debugger;
         if (this.htmlFromUrl) {
             resolve(this.htmlFromUrl);
         } else {
@@ -49,7 +59,6 @@ BaseAnalyzer.prototype.getHtmlFromUrl = function() {
                 crossDomain: true,
                 type: "GET",
                 success: function(data) {
-                    debugger;
                     this.htmlFromUrl = data.responseText;
                     resolve(data.responseText);
                 },
@@ -61,7 +70,6 @@ BaseAnalyzer.prototype.getHtmlFromUrl = function() {
     });
 }
 
-
 // Emag.bg analyzer class
 
 function EmagAnalyzer(url) {
@@ -71,6 +79,9 @@ function EmagAnalyzer(url) {
 EmagAnalyzer.prototype = Object.create(BaseAnalyzer.prototype);
 
 EmagAnalyzer.prototype.getPrice = function() {
+    debugger;
+    this.currency = Currencies.BGN;
+
     return new Promise((resolve, reject) => {
         this.getHtmlFromUrl().then(function(html) {
             var $html = $(html);
@@ -125,6 +136,9 @@ function EbayCoUkAnalyzer(url) {
 EbayCoUkAnalyzer.prototype = Object.create(BaseAnalyzer.prototype);
 
 EbayCoUkAnalyzer.prototype.getPrice = function() {
+    debugger;
+    this.currency = Currencies.GBP;
+
     return new Promise((resolve, reject) => {
         this.getHtmlFromUrl().then(function(html) {
             var $html = $(html);

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 	<% include ../../partials/head %>
+    <script src="/scripts/currencies.js"></script>
     <script src="/scripts/websiteAnalyzers.js"></script>
     <script src="/scripts/analyzers.js"></script>
 </head>
@@ -43,8 +44,18 @@
                                         <label for='objectName'>Object name</label> 
                                         <input id='objectName' name='objectName' type='text' />
                                         
-                                        <label for='objectPrice'>Price</label> 
-                                        <input id='objectPrice' name='objectPrice' type='text' />
+                                        <table>
+                                            <tr>
+                                                <td width="80%">
+                                                    <label for='objectPrice'>Price</label> 
+                                                    <input id='objectPrice' name='objectPrice' type='text' />
+                                                </td>
+                                                <td width="20%">
+                                                    <label for='objectCurrencySymbol'>Currency</label>
+                                                    <input id='objectCurrency' name='objectCurrency' type='hidden' />
+                                                    <input id='objectCurrencySymbol' name='objectCurrencySymbol' type='text' style='text-align: center;' disabled="disabled" />
+                                                </td>
+                                        </table>
                                         
                                         <label for='objectDescription'>Description</label> 
                                         <textarea id='objectDescription' name='objectDescription'></textarea>
