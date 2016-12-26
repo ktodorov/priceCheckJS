@@ -6,7 +6,8 @@ Websites = {
     Ebay: "ebay",
     EbayCom: "ebay.com",
     EbayCoUk: "ebay.co.uk",
-    Technopolis: "technopolis.bg"
+    Technopolis: "technopolis.bg",
+    Technomarket: "technomarket.bg"
 };
 
 exports.Websites = Websites;
