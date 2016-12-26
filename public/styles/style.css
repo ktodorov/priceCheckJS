@@ -178,3 +178,47 @@ body {
     padding: 10px;
     text-align: center;
 }
+
+
+/* Paging styles */
+
+button.pageSelect {
+    background: none;
+    border: 1px solid #ccc;
+    padding: 4px 5px;
+    min-width: 30px;
+}
+
+button.pageSelect[disabled='disabled'] {
+    background: #eef;
+    border: 1px solid #18e;
+}
+
+button.pageSelect:hover {
+    background: #ddd;
+}
+
+button.pageSelect[disabled='disabled']:hover {
+    background: #eef;
+}
+
+#pagingSizeSelect {
+    height: 30px;
+    width: 60px;
+}
+
+span.paging-info {
+    font-weight: bold;
+    font-size: 12px;
+    color: #137;
+}
+
+table.paging-table {
+    border: 1px solid #ddd;
+    background: #fdfdfd;
+    margin-bottom: 10px;
+}
+
+table.paging-table td {
+    padding: 10px 5px;
+}

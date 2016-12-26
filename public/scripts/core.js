@@ -52,26 +52,30 @@ function is_server() {
     return (typeof process === 'object' && process + '' === '[object process]');
 }
 
-function parseDocRecursively(cache, res) {
+function parseDocRecursively(cache, callbackFunction) {
     var currentDocNumber = cache.get("docsParsed");
     var docs = cache.get("docs");
 
     var analyzer = websiteAnalyzers.getAnalyzerFromUrl(docs[currentDocNumber].objectUrl);
     analyzer.getHtmlFromUrl(function() {
-        var currentDoc = cache.get("docs")[currentDocNumber];
-        var website = getWebsiteFromUrl(currentDoc.objectUrl, false);
-        var currency = currencies.getCurrencySymbol(currentDoc.currency);
+        try {
+            var currentDoc = cache.get("docs")[currentDocNumber];
+            var website = getWebsiteFromUrl(currentDoc.objectUrl, false);
+            var currency = currencies.getCurrencySymbol(currentDoc.currency);
 
-        currentDoc.website = website;
-        currentDoc.currency = currency;
+            currentDoc.website = website;
+            currentDoc.currency = currency;
 
-        var price = analyzer.getPrice();
-        if (price && price != currentDoc.newPrice) {
-            currentDoc.newPrice = price;
+            var price = analyzer.getPrice();
+            if (price && price != currentDoc.newPrice) {
+                currentDoc.newPrice = price;
+            }
+
+            var imageUrl = analyzer.getImageUrl()
+            currentDoc.imageUrl = imageUrl;
+        } catch (err) {
+            console.log("error occured: ", err);
         }
-
-        var imageUrl = analyzer.getImageUrl()
-        currentDoc.imageUrl = imageUrl;
 
         var docs = cache.get("docs");
         docs[currentDocNumber] = currentDoc;
@@ -83,11 +87,9 @@ function parseDocRecursively(cache, res) {
         var docsLength = cache.get("docsLength");
 
         if (docsParsed >= docsLength) {
-            res.render('pages/objects/index', {
-                "objectslist": cache.get("docs")
-            });
+            callbackFunction(cache.get("docs"));
         } else {
-            parseDocRecursively(cache, res);
+            parseDocRecursively(cache, callbackFunction);
         }
 
     }.bind(this))

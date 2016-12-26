@@ -53,17 +53,31 @@ app.get('/about', function(req, res) {
 
 // objects index page 
 app.get('/objects', function(req, res) {
+    var skip = parseInt(req.query.skip);
+    if (!skip) {
+        skip = 0;
+    }
+    var take = parseInt(req.query.take);
+    if (!take) {
+        take = 10;
+    }
+
     var db = req.db;
     var collection = db.get('priceCheckObjectsCollection');
-    collection.find({}, {}, function(e, docs) {
-        try {
+    collection.count({}, function(error, docsCount) {
+        collection.find({}, { skip: skip, limit: take }, function(e, docs) {
             cache.put("docsLength", docs.length);
             cache.put("docsParsed", 0);
             cache.put("docs", docs);
-            core.parseDocRecursively(cache, res);
-        } catch (e) {
-            console.log("error occured: ", e);
-        }
+            core.parseDocRecursively(cache, function(docs) {
+                res.render('pages/objects/index', {
+                    "objectslist": docs,
+                    "objectsCount": docsCount,
+                    "skip": skip,
+                    "take": take
+                });
+            });
+        });
     });
 });
 

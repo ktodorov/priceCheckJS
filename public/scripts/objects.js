@@ -48,3 +48,33 @@ function analyzeObject() {
         }
     });
 }
+
+function pageSizeChanged(object) {
+    var size = parseInt(object.value);
+    var currentUrl = window.location.href;
+    var newUrl = updateQueryStringParameter(currentUrl, "take", size);
+    newUrl = updateQueryStringParameter(newUrl, "skip", 0);
+    window.location.href = newUrl;
+}
+
+function updateQueryStringParameter(uri, key, value) {
+    var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+    var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+    if (uri.match(re)) {
+        return uri.replace(re, '$1' + key + "=" + value + '$2');
+    } else {
+        return uri + separator + key + "=" + value;
+    }
+}
+
+function changeSelection(value) {
+    $("#pagingSizeSelect").val(value);
+}
+
+function changePage(size, pageRequested) {
+    var skip = (pageRequested - 1) * size;
+    var currentUrl = window.location.href;
+    var newUrl = updateQueryStringParameter(currentUrl, "skip", skip);
+    newUrl = updateQueryStringParameter(newUrl, "take", size);
+    window.location.href = newUrl;
+}

@@ -1,0 +1,37 @@
+<script>
+    $(document).ready(function() {
+        changeSelection(<%= take %>);
+    })
+</script>
+
+<table style='width: 100%;' class='paging-table'>
+    <tr>
+        <td style='text-align: left;' width="33%">
+            <span class='paging-info'>Pages</span>
+            <% for(var i=0; i <= objectsCount / take; i++) { %>
+                <% if (i * take == skip) { %>
+                    <button class='pageSelect' disabled="disabled">
+                        <%= i + 1 %>
+                    </button>
+                <% } else { %>
+                    <button class='pageSelect' onclick='changePage(<%= take %>, <%= i + 1 %>);'>
+                        <%= i + 1 %>
+                    </button>
+                <% } %>
+            <% } %>
+        </td>
+        <td style='text-align: center;' width="33%">
+            <span class='paging-info'>
+                All products: <%= objectsCount %>
+            </span>
+        </td>
+        <td style='text-align: right;' width="33%">
+            <span class='paging-info'>Products per page</span>
+            <select id='pagingSizeSelect' onchange='pageSizeChanged(this);'>
+                <option value='5'>5</option>
+                <option value='10'>10</option>
+                <option value='25'>25</option>  
+            </select>
+        </td>
+    </tr>
+</table>
