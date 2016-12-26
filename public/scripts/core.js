@@ -93,7 +93,35 @@ function parseDocRecursively(cache, res) {
     }.bind(this))
 }
 
+function analyzeObject(url, callbackFunction) {
+    var website = getWebsiteFromUrl(url);
+
+    if (!website || !url) {
+        return;
+    }
+
+    var analyzer = websiteAnalyzers.getAnalyzerFromUrl(url);
+
+    analyzer.getHtmlFromUrl(function() {
+        var price = analyzer.getPrice();
+        var imageUrl = analyzer.getImageUrl();
+        var name = analyzer.getName();
+        var currencySymbol = analyzer.getCurrencySymbol();
+
+        var result = {
+            "name": name,
+            "price": price,
+            "imageUrl": imageUrl,
+            "currency": analyzer.currency,
+            "currencySymbol": currencySymbol
+        }
+
+        callbackFunction(result);
+    });
+}
+
 exports.getWebsiteFromUrl = getWebsiteFromUrl;
 exports.getNumberFromString = getNumberFromString;
 exports.guid = guid;
 exports.parseDocRecursively = parseDocRecursively;
+exports.analyzeObject = analyzeObject;

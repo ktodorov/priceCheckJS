@@ -11,8 +11,8 @@ body {
 }
 
 .grid-table td {
-    border-bottom: 1px solid #ddd;
-    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #eee;
+    border-top: 1px solid #eee;
 }
 
 .grid-table th {
@@ -24,8 +24,20 @@ body {
 
 .grid-table th,
 .grid-table td {
-    padding: 5px 0;
+    padding: 5px;
     text-align: center;
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+}
+
+.grid-table th:first-child,
+.grid-table td:first-child {
+    border-left: none;
+}
+
+.grid-table th:last-child,
+.grid-table td:last-child {
+    border-right: none;
 }
 
 .grid-table th.left-aligned,

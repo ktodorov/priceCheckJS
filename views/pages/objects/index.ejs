@@ -52,7 +52,13 @@
                         <td class='left-aligned' data-property='name'><%= objectslist[i].name %></td>
                         <td data-property='oldPrice'><%= objectslist[i].oldPrice %></td>
                         <td data-property='newPrice'><%= objectslist[i].newPrice %></td>
-                        <td data-property='priceDifference'><%= objectslist[i].newPrice - objectslist[i].oldPrice %></td>
+                        <td data-property='priceDifference '>
+                            <% if (objectslist[i].newPrice - objectslist[i].oldPrice < 0) { %>
+                                <span style='color: red; font-weight: bold;'><%= objectslist[i].newPrice - objectslist[i].oldPrice %></span>
+                        <% } else { %>
+                                <%= objectslist[i].newPrice - objectslist[i].oldPrice %>
+                        <% } %>
+                        </td>
                         <td data-property='currency'><%= objectslist[i].currency %></td>
                         <td data-property='website'><a href='<%= objectslist[i].objectUrl %>'><%= objectslist[i].website %></a></td>
                     </tr>

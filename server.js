@@ -20,8 +20,6 @@ window = doc.defaultView;
 $ = jQuery = require('jquery');
 
 var core = require("./public/scripts/core.js");
-var websiteAnalyzers = require("./public/scripts/websiteAnalyzers.js");
-var currencies = require("./public/scripts/currencies.js");
 
 var cache = require("memory-cache");
 
@@ -106,7 +104,6 @@ app.post('/objects/create', function(req, res) {
 
     // Submit to the DB
     collection.insert({
-        // "id": objectIdentifier,
         "name": objectName,
         "objectUrl": objectUrl,
         "oldPrice": objectOldPrice,
@@ -129,30 +126,9 @@ app.post('/objects/create', function(req, res) {
 
 app.get("/analyzeObject", function(req, res) {
     var url = req.query.url;
-    var website = core.getWebsiteFromUrl(url);
-
-    if (!website || !url) {
-        return;
-    }
-
-    var analyzer = websiteAnalyzers.getAnalyzerFromUrl(url);
-
-    analyzer.getHtmlFromUrl(function() {
-        var price = analyzer.getPrice();
-        var imageUrl = analyzer.getImageUrl();
-        var name = analyzer.getName();
-        var currencySymbol = analyzer.getCurrencySymbol();
-
-        var result = {
-            "name": name,
-            "price": price,
-            "imageUrl": imageUrl,
-            "currency": analyzer.currency,
-            "currencySymbol": currencySymbol
-        }
-
+    core.analyzeObject(url, function(result) {
         res.send(result);
-    });
+    })
 });
 
 app.listen(8080);
