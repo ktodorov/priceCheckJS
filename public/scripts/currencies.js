@@ -1,11 +1,5 @@
-function is_server() {
-    return (typeof process === 'object' && process + '' === '[object process]');
-}
-
-if (is_server()) {
-    var websitesLibrary = require("./websites.js");
-    var Websites = websitesLibrary.Websites;
-}
+var websitesLibrary = require("./websites.js");
+var Websites = websitesLibrary.Websites;
 
 Currencies = {
     BGN: 0,
@@ -46,9 +40,7 @@ function getCurrencyFromWebsite(website) {
     return Currencies.BGN;
 }
 
-(function(exports) {
-    exports.Currencies = Currencies;
-    exports.CurrencySymbols = CurrencySymbols;
-    exports.getCurrencySymbol = getCurrencySymbol;
-    exports.getCurrencyFromWebsite = getCurrencyFromWebsite;
-})(typeof exports === 'undefined' ? this['mymodule'] = {} : exports);
+exports.Currencies = Currencies;
+exports.CurrencySymbols = CurrencySymbols;
+exports.getCurrencySymbol = getCurrencySymbol;
+exports.getCurrencyFromWebsite = getCurrencyFromWebsite;

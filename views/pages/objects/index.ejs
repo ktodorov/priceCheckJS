@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="/scripts/core.js"></script>
-    <script src="/scripts/websites.js"></script>
-    <script src="/scripts/currencies.js"></script>
+    <script src="/scripts/objects.js"></script>
 	<% include ../../partials/head %>
 </head>
 <body class="container">
@@ -22,6 +20,7 @@
             </a>
         </div>
 
+
         <table class='grid-table'>
             <tr>
                 <th>
@@ -37,10 +36,10 @@
                     New price
                 </th>
                 <th>
-                    Currency
+                    Difference
                 </th>
                 <th>
-                    Difference
+                    Currency
                 </th>
                 <th>
                     Website
@@ -48,14 +47,14 @@
             </tr>
             <% if (objectslist && objectslist.length > 0) { %>
                 <% for(var i=0; i < objectslist.length; i++) { %>
-                    <tr>
-                        <td style='text-align: center;'><img src='<%= objectslist[i].imageUrl %>' alt='objectslist[i].name '/></td>
-                        <td class='left-aligned'><%= objectslist[i].name %></td>
-                        <td><%= objectslist[i].oldPrice %></td>
-                        <td><%= objectslist[i].newPrice %></td>
-                        <td><%= objectslist[i].currency %></td>
-                        <td><%= objectslist[i].newPrice - objectslist[i].oldPrice %></td>
-                        <td><a href='<%= objectslist[i].objectUrl %>'><%= objectslist[i].website %></a></td>
+                    <tr object-id='<%= objectslist[i]._id %>'>
+                        <td style='text-align: center;' data-property='image'><img src='<%= objectslist[i].imageUrl %>' alt='objectslist[i].name '/></td>
+                        <td class='left-aligned' data-property='name'><%= objectslist[i].name %></td>
+                        <td data-property='oldPrice'><%= objectslist[i].oldPrice %></td>
+                        <td data-property='newPrice'><%= objectslist[i].newPrice %></td>
+                        <td data-property='priceDifference'><%= objectslist[i].newPrice - objectslist[i].oldPrice %></td>
+                        <td data-property='currency'><%= objectslist[i].currency %></td>
+                        <td data-property='website'><a href='<%= objectslist[i].objectUrl %>'><%= objectslist[i].website %></a></td>
                     </tr>
                 <% } %>
             <% } else { %>

@@ -9,6 +9,4 @@ Websites = {
     Technopolis: "technopolis.bg"
 };
 
-(function(exports) {
-    exports.Websites = Websites;
-})(typeof exports === 'undefined' ? this['mymodule'] = {} : exports);
+exports.Websites = Websites;

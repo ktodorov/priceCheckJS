@@ -20,8 +20,10 @@ window = doc.defaultView;
 $ = jQuery = require('jquery');
 
 var core = require("./public/scripts/core.js");
-var analyzers = require("./public/scripts/analyzers.js");
+var websiteAnalyzers = require("./public/scripts/websiteAnalyzers.js");
 var currencies = require("./public/scripts/currencies.js");
+
+var cache = require("memory-cache");
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -56,33 +58,16 @@ app.get('/objects', function(req, res) {
     var db = req.db;
     var collection = db.get('priceCheckObjectsCollection');
     collection.find({}, {}, function(e, docs) {
-        for (var i = 0; i < docs.length; i++) {
-            try {
-                var website = core.getWebsiteFromUrl(docs[i].objectUrl, false);
-                var analyzer = analyzers.getAnalyzerFromUrl(docs[i].objectUrl);
-                var currency = currencies.getCurrencySymbol(docs[i].currency);
-
-                docs[i].website = website;
-                docs[i].currency = currency;
-
-                analyzer.getImageUrl()
-                    .then(function(imageUrl) {
-                        docs[i].imageUrl = imageUrl;
-                    })
-                    .catch(err => {
-                        console.log("error occured: ", err);
-                    });
-            } catch (e) {
-                console.log("error occured: ", e);
-            }
+        try {
+            cache.put("docsLength", docs.length);
+            cache.put("docsParsed", 0);
+            cache.put("docs", docs);
+            core.parseDocRecursively(cache, res);
+        } catch (e) {
+            console.log("error occured: ", e);
         }
-
-        res.render('pages/objects/index', {
-            "objectslist": docs
-        });
     });
 });
-
 
 
 // objects create page 
@@ -106,6 +91,8 @@ app.post('/objects/create', function(req, res) {
     var objectImageUrl = req.body.imageUrl;
     var objectWebsite = req.body.website;
     var objectCurrency = req.body.objectCurrency;
+    // var objectIdentifier = core.guid();
+
     // console.log('objectName = ' + objectName);
     // console.log('objectUrl = ' + objectUrl);
     // console.log('objectDescription = ' + objectDescription);
@@ -119,6 +106,7 @@ app.post('/objects/create', function(req, res) {
 
     // Submit to the DB
     collection.insert({
+        // "id": objectIdentifier,
         "name": objectName,
         "objectUrl": objectUrl,
         "oldPrice": objectOldPrice,
@@ -137,6 +125,34 @@ app.post('/objects/create', function(req, res) {
         }
     });
 
+});
+
+app.get("/analyzeObject", function(req, res) {
+    var url = req.query.url;
+    var website = core.getWebsiteFromUrl(url);
+
+    if (!website || !url) {
+        return;
+    }
+
+    var analyzer = websiteAnalyzers.getAnalyzerFromUrl(url);
+
+    analyzer.getHtmlFromUrl(function() {
+        var price = analyzer.getPrice();
+        var imageUrl = analyzer.getImageUrl();
+        var name = analyzer.getName();
+        var currencySymbol = analyzer.getCurrencySymbol();
+
+        var result = {
+            "name": name,
+            "price": price,
+            "imageUrl": imageUrl,
+            "currency": analyzer.currency,
+            "currencySymbol": currencySymbol
+        }
+
+        res.send(result);
+    });
 });
 
 app.listen(8080);
