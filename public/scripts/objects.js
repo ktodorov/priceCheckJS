@@ -71,10 +71,27 @@ function changeSelection(value) {
     $("#pagingSizeSelect").val(value);
 }
 
+function changeSearchText(value) {
+    if (value && value != "undefined") {
+        $("#search-input").val(value);
+    }
+}
+
 function changePage(size, pageRequested) {
     var skip = (pageRequested - 1) * size;
     var currentUrl = window.location.href;
     var newUrl = updateQueryStringParameter(currentUrl, "skip", skip);
     newUrl = updateQueryStringParameter(newUrl, "take", size);
+    window.location.href = newUrl;
+}
+
+function search(currentSearchText) {
+    var searchText = $("#search-input").val();
+    if (searchText == currentSearchText) {
+        return;
+    }
+    var currentUrl = window.location.href;
+    var newUrl = updateQueryStringParameter(currentUrl, "search", searchText);
+    newUrl = updateQueryStringParameter(newUrl, "skip", 0);
     window.location.href = newUrl;
 }

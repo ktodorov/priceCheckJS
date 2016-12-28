@@ -4,12 +4,6 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 
-var mongo = require('mongodb');
-var monk = require('monk');
-var db = monk('localhost:27017/priceCheckDb');
-// To start MongoDB:
-// mongod --dbpath e:\OneDrive\University\Year4\JavascriptAdvanced\priceCheckJS\data\ 
-
 require('babel-core/register');
 
 var jsdom = require("jsdom").jsdom;
@@ -18,6 +12,9 @@ window = doc.defaultView;
 
 // Load jQuery with the simulated jsdom window.
 $ = jQuery = require('jquery');
+
+require("./database/connection.js");
+var Product = require("./database/collections/productsCollection.js");
 
 var core = require("./public/scripts/core.js");
 
@@ -28,12 +25,6 @@ app.set('view engine', 'ejs');
 
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/images'));
-
-// Make our db accessible to our router
-app.use(function(req, res, next) {
-    req.db = db;
-    next();
-});
 
 //Note that in version 4 of express, express.bodyParser() was
 //deprecated in favor of a separate 'body-parser' module.
@@ -62,21 +53,48 @@ app.get('/objects', function(req, res) {
         take = 10;
     }
 
-    var db = req.db;
-    var collection = db.get('priceCheckObjectsCollection');
-    collection.count({}, function(error, docsCount) {
-        collection.find({}, { skip: skip, limit: take }, function(e, docs) {
-            cache.put("docsLength", docs.length);
-            cache.put("docsParsed", 0);
-            cache.put("docs", docs);
-            core.parseDocRecursively(cache, function(docs) {
-                res.render('pages/objects/index', {
-                    "objectslist": docs,
-                    "objectsCount": docsCount,
-                    "skip": skip,
-                    "take": take
+    var searchText = req.query.search;
+    var queryOptions = { skip: skip, limit: take };
+    var searchOptions = {};
+
+    if (!searchText) {
+        searchOptions = {};
+    } else {
+        searchOptions = {
+            $text: {
+                $search: searchText
+            }
+        }
+    }
+
+    Product.count(searchOptions, function(error, docsCount) {
+        Product.find(searchOptions).skip(skip).limit(take).exec(function(err, docs) {
+            try {
+                if (!docs || docs.length == 0) {
+                    res.render('pages/objects/index', {
+                        "objectslist": docs,
+                        "objectsCount": docsCount,
+                        "skip": skip,
+                        "take": take,
+                        "search": searchText
+                    });
+                    return;
+                }
+                cache.put("docsLength", docs.length);
+                cache.put("docsParsed", 0);
+                cache.put("docs", docs);
+                core.parseDocRecursively(cache, function(docs) {
+                    res.render('pages/objects/index', {
+                        "objectslist": docs,
+                        "objectsCount": docsCount,
+                        "skip": skip,
+                        "take": take,
+                        "search": searchText
+                    });
                 });
-            });
+            } catch (e) {
+                console.log("error occured: ", e);
+            }
         });
     });
 });
@@ -89,11 +107,6 @@ app.get('/objects/create', function(req, res) {
 
 // objects create page 
 app.post('/objects/create', function(req, res) {
-    // Set our internal DB variable
-    var db = req.db;
-
-    console.log('posting...');
-
     // Get our form values. These rely on the "name" attributes
     var objectName = req.body.objectName;
     var objectUrl = req.body.objectUrl;
@@ -113,11 +126,8 @@ app.post('/objects/create', function(req, res) {
     // console.log('objectImageUrl = ' + objectImageUrl);
     // console.log('objectWebsite = ' + objectWebsite);
 
-    // Set our collection
-    var collection = db.get('priceCheckObjectsCollection');
-
     // Submit to the DB
-    collection.insert({
+    new Product({
         "name": objectName,
         "objectUrl": objectUrl,
         "oldPrice": objectOldPrice,
@@ -126,7 +136,7 @@ app.post('/objects/create', function(req, res) {
         "imageUrl": objectImageUrl,
         "website": objectWebsite,
         "currency": objectCurrency
-    }, function(err, doc) {
+    }).save(function(err, doc) {
         if (err) {
             // If it failed, return error
             res.send("There was a problem adding the information to the database.");

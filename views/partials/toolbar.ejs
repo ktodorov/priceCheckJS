@@ -1,0 +1,16 @@
+<script>
+    $(document).ready(function() {
+        changeSearchText('<%= search %>');
+    })
+</script>
+
+<div class='commands-div'>
+    <a class='command-button' href='/objects/create'>
+        + Add new price check object
+    </a>
+
+    <span class='toolbar-separator'></span>
+
+    <input id="search-input" type='text' placeholder='Search...' />
+    <button class='submit-button' onclick="search('<%= search %>');">Search</button>
+</div>

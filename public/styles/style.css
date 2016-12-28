@@ -222,3 +222,17 @@ table.paging-table {
 table.paging-table td {
     padding: 10px 5px;
 }
+
+
+/* Toolbar */
+
+span.toolbar-separator {
+    border: 1px solid #ccc;
+    border-left: none;
+    margin: 0 7px;
+    padding: 5px 0;
+}
+
+#search-input {
+    height: 30px;
+}
