@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<% include ../../partials/head %>
+    <script src="/scripts/objects.js"></script>
+</head>
+<body class="container">
+
+	<header>
+		<% include ../../partials/header %>
+	</header>
+
+	<main>
+        <div class='page-header'>
+            Edit document
+        </div>
+
+        <a class='navigation-button' href='/objects'>
+        Go back to all objects
+        </a>
+
+        <table style='width: 100%;'>
+            <tr>
+                <td>
+                    <img id='objectImage' src='<%= doc.imageUrl %>' style='width:100%;' />
+                </td>
+                <td>
+                    <div class='form-div'>
+                        <form name='addPriceObject' method="post" action="/objects/edit/<%= doc._id %>">
+                            <fieldset>
+                                <div class='form-body-div'>
+                                    <input id='objectId' name='objectId' type='hidden' value='<%= doc._id %>' />
+
+                                    <label for='objectUrl'>Object URL</label> 
+                                    <input id='objectUrl' name='objectUrl' type='text' onchange='analyzeObject();' disabled='disabled' value='<%= doc.objectUrl %>' />
+                                    
+                                    <div id='additionalFields'>
+                                        <label for='objectName'>Object name</label> 
+                                        <input id='objectName' name='objectName' type='text' value='<%= doc.name %>' />
+                                        
+                                        <table>
+                                            <tr>
+                                                <td width="80%">
+                                                    <label for='objectPrice'>Price</label> 
+                                                    <input id='objectPrice' name='objectPrice' type='text' value='<%= doc.newPrice %>' disabled='disabled' />
+                                                </td>
+                                                <td width="20%">
+                                                    <label for='objectCurrencySymbol'>Currency</label>
+                                                    <input id='objectCurrency' name='objectCurrency' type='hidden' value='<%= doc.currency %>' />
+                                                    <input id='objectCurrencySymbol' name='objectCurrencySymbol' type='text' style='text-align: center;' disabled="disabled" value='<%= doc.currencySymbol %>' />
+                                                </td>
+                                        </table>
+                                        
+                                        <label for='objectDescription'>Description</label> 
+                                        <textarea id='objectDescription' name='objectDescription'><%= doc.description %></textarea>
+                                    </div>
+                                </div>
+
+                                <div class='form-commands-div'>
+                                    <button type='submit' class='submit-button'>Save</button>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        </table>
+	</main>
+
+	<footer>
+		<% include ../../partials/footer %>
+	</footer>
+	
+</body>
+</html>

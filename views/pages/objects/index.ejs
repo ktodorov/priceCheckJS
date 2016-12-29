@@ -39,6 +39,11 @@
                 <th>
                     Website
                 </th>
+                <th>
+                    Description
+                </th>
+                <th>
+                </th>
             </tr>
             <% if (objectslist && objectslist.length > 0) { %>
                 <% for(var i=0; i < objectslist.length; i++) { %>
@@ -56,6 +61,8 @@
                         </td>
                         <td data-property='currency'><%= objectslist[i].currency %></td>
                         <td data-property='website'><a href='<%= objectslist[i].objectUrl %>'><%= objectslist[i].website %></a></td>
+                        <td data-property='description'><%= objectslist[i].description %></td>
+                        <td><a href='/objects/edit/<%= objectslist[i]._id %>'>Edit</a></td>
                     </tr>
                 <% } %>
             <% } else { %>

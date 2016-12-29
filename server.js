@@ -17,6 +17,7 @@ require("./database/connection.js");
 var Product = require("./database/collections/productsCollection.js");
 
 var core = require("./public/scripts/core.js");
+var currencies = require("./public/scripts/currencies.js");
 
 var cache = require("memory-cache");
 
@@ -99,6 +100,34 @@ app.get('/objects', function(req, res) {
     });
 });
 
+// objects create page 
+app.get('/objects/edit/:id', function(req, res) {
+    var productId = req.params.id;
+    Product.findOne({ '_id': productId }, function(err, doc) {
+        if (doc) {
+            var currencySymbol = currencies.getCurrencySymbol(doc.currency);
+            doc.currencySymbol = currencySymbol;
+        } else {
+            doc = {};
+        }
+        res.render('pages/objects/edit', {
+            "doc": doc
+        });
+    });
+});
+
+app.post('/objects/edit/:id', function(req, res) {
+    var productId = req.params.id;
+
+    var updatedProduct = {
+        "name": req.body.objectName,
+        "description": req.body.objectDescription,
+    }
+
+    Product.findByIdAndUpdate(productId, updatedProduct, function(err, doc) {
+        res.redirect("/objects");
+    });
+});
 
 // objects create page 
 app.get('/objects/create', function(req, res) {
@@ -116,15 +145,6 @@ app.post('/objects/create', function(req, res) {
     var objectImageUrl = req.body.imageUrl;
     var objectWebsite = req.body.website;
     var objectCurrency = req.body.objectCurrency;
-    // var objectIdentifier = core.guid();
-
-    // console.log('objectName = ' + objectName);
-    // console.log('objectUrl = ' + objectUrl);
-    // console.log('objectDescription = ' + objectDescription);
-    // console.log('objectOldPrice = ' + objectOldPrice);
-    // console.log('objectNewPrice = ' + objectNewPrice);
-    // console.log('objectImageUrl = ' + objectImageUrl);
-    // console.log('objectWebsite = ' + objectWebsite);
 
     // Submit to the DB
     new Product({
