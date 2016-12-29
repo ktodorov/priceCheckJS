@@ -58,6 +58,17 @@ body {
     max-width: 150px;
 }
 
+.grid-table td[data-property='oldPrice'] {
+    text-decoration: line-through;
+}
+
+.grid-table td[data-property='oldPrice'],
+.grid-table td[data-property='newPrice'],
+.grid-table td[data-property='priceDifference'] {
+    border-right: none;
+    border-left: none;
+}
+
 
 /* Commands styles */
 
@@ -66,6 +77,7 @@ body {
 }
 
 .command-button {
+    background: none;
     color: #159;
     text-decoration: none;
     border: 1px solid #ccc;

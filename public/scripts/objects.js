@@ -95,3 +95,9 @@ function search(currentSearchText) {
     newUrl = updateQueryStringParameter(newUrl, "skip", 0);
     window.location.href = newUrl;
 }
+
+function deleteProduct(productId) {
+    if (confirm('Are you sure you want to delete this product')) {
+        window.location.href = window.location.href + "/delete/" + productId
+    }
+}

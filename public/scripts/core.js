@@ -54,17 +54,15 @@ function is_server() {
 
 function parseDocRecursively(cache, callbackFunction) {
     var currentDocNumber = cache.get("docsParsed");
-    var docs = cache.get("docs");
 
-    var analyzer = websiteAnalyzers.getAnalyzerFromUrl(docs[currentDocNumber].objectUrl);
+    var analyzer = websiteAnalyzers.getAnalyzerFromUrl(cache.get("docs")[currentDocNumber].objectUrl);
     analyzer.getHtmlFromUrl(function() {
+        var currentDoc = cache.get("docs")[currentDocNumber];
         try {
-            var currentDoc = cache.get("docs")[currentDocNumber];
             var website = getWebsiteFromUrl(currentDoc.objectUrl, false);
-            var currency = currencies.getCurrencySymbol(currentDoc.currency);
-
+            var currencySymbol = currencies.getCurrencySymbol(currentDoc.currency);
             currentDoc.website = website;
-            currentDoc.currency = currency;
+            currentDoc.currencySymbol = currencySymbol;
 
             var price = analyzer.getPrice();
             if (price && price != currentDoc.newPrice) {
@@ -80,6 +78,7 @@ function parseDocRecursively(cache, callbackFunction) {
         var docs = cache.get("docs");
         docs[currentDocNumber] = currentDoc;
         cache.put("docs", docs);
+
 
         var docsParsed = cache.get("docsParsed");
         docsParsed += 1;

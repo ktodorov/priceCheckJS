@@ -44,7 +44,7 @@ app.get('/about', function(req, res) {
 });
 
 // objects index page 
-app.get('/objects', function(req, res) {
+app.get('/products', function(req, res) {
     var skip = parseInt(req.query.skip);
     if (!skip) {
         skip = 0;
@@ -72,7 +72,7 @@ app.get('/objects', function(req, res) {
         Product.find(searchOptions).skip(skip).limit(take).exec(function(err, docs) {
             try {
                 if (!docs || docs.length == 0) {
-                    res.render('pages/objects/index', {
+                    res.render('pages/products/index', {
                         "objectslist": docs,
                         "objectsCount": docsCount,
                         "skip": skip,
@@ -84,9 +84,9 @@ app.get('/objects', function(req, res) {
                 cache.put("docsLength", docs.length);
                 cache.put("docsParsed", 0);
                 cache.put("docs", docs);
-                core.parseDocRecursively(cache, function(docs) {
-                    res.render('pages/objects/index', {
-                        "objectslist": docs,
+                core.parseDocRecursively(cache, function(parsedDocs) {
+                    res.render('pages/products/index', {
+                        "objectslist": parsedDocs,
                         "objectsCount": docsCount,
                         "skip": skip,
                         "take": take,
@@ -101,7 +101,7 @@ app.get('/objects', function(req, res) {
 });
 
 // objects create page 
-app.get('/objects/edit/:id', function(req, res) {
+app.get('/products/edit/:id', function(req, res) {
     var productId = req.params.id;
     Product.findOne({ '_id': productId }, function(err, doc) {
         if (doc) {
@@ -110,13 +110,13 @@ app.get('/objects/edit/:id', function(req, res) {
         } else {
             doc = {};
         }
-        res.render('pages/objects/edit', {
+        res.render('pages/products/edit', {
             "doc": doc
         });
     });
 });
 
-app.post('/objects/edit/:id', function(req, res) {
+app.post('/products/edit/:id', function(req, res) {
     var productId = req.params.id;
 
     var updatedProduct = {
@@ -125,17 +125,17 @@ app.post('/objects/edit/:id', function(req, res) {
     }
 
     Product.findByIdAndUpdate(productId, updatedProduct, function(err, doc) {
-        res.redirect("/objects");
+        res.redirect("/products");
     });
 });
 
 // objects create page 
-app.get('/objects/create', function(req, res) {
-    res.render('pages/objects/create');
+app.get('/products/create', function(req, res) {
+    res.render('pages/products/create');
 });
 
 // objects create page 
-app.post('/objects/create', function(req, res) {
+app.post('/products/create', function(req, res) {
     // Get our form values. These rely on the "name" attributes
     var objectName = req.body.objectName;
     var objectUrl = req.body.objectUrl;
@@ -162,10 +162,17 @@ app.post('/objects/create', function(req, res) {
             res.send("There was a problem adding the information to the database.");
         } else {
             // And forward to success page
-            res.redirect("/objects");
+            res.redirect("/products");
         }
     });
 
+});
+
+app.get("/products/delete/:id", function(req, res) {
+    var productId = req.params.id;
+    Product.findByIdAndRemove({ '_id': productId }, function(err, doc) {
+        res.redirect("/products");
+    });
 });
 
 app.get("/analyzeObject", function(req, res) {

@@ -12,52 +12,56 @@
 
 	<main>
         <div class='page-header'>
-            Edit document
+            Add new price check object
         </div>
 
-        <a class='navigation-button' href='/objects'>
-        Go back to all objects
+        <a class='navigation-button' href='/products'>
+            <i class="fa fa-angle-left" aria-hidden="true"></i> Go back to all objects
         </a>
 
         <table style='width: 100%;'>
             <tr>
                 <td>
-                    <img id='objectImage' src='<%= doc.imageUrl %>' style='width:100%;' />
+                    <img id='objectImage' src='' style='width:100%;' class='invisible' />
                 </td>
                 <td>
                     <div class='form-div'>
-                        <form name='addPriceObject' method="post" action="/objects/edit/<%= doc._id %>">
+                        <form name='addPriceObject' method="post" action="/products/create">
                             <fieldset>
                                 <div class='form-body-div'>
-                                    <input id='objectId' name='objectId' type='hidden' value='<%= doc._id %>' />
-
                                     <label for='objectUrl'>Object URL</label> 
-                                    <input id='objectUrl' name='objectUrl' type='text' onchange='analyzeObject();' disabled='disabled' value='<%= doc.objectUrl %>' />
+                                    <input id='objectUrl' name='objectUrl' type='text' onchange='analyzeObject();' autofocus />
                                     
-                                    <div id='additionalFields'>
+                                    <div id='loading-div' class='invisible'>
+                                        <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>
+                                    </div>
+
+                                    <div id='additionalFields' class='invisible'>
+                                        <input id='imageUrl' name='imageUrl' type='hidden' />
+
                                         <label for='objectName'>Object name</label> 
-                                        <input id='objectName' name='objectName' type='text' value='<%= doc.name %>' />
+                                        <input id='objectName' name='objectName' type='text' />
                                         
                                         <table>
                                             <tr>
                                                 <td width="80%">
                                                     <label for='objectPrice'>Price</label> 
-                                                    <input id='objectPrice' name='objectPrice' type='text' value='<%= doc.newPrice %>' disabled='disabled' />
+                                                    <input id='objectPrice' name='objectPrice' type='text' />
                                                 </td>
                                                 <td width="20%">
                                                     <label for='objectCurrencySymbol'>Currency</label>
-                                                    <input id='objectCurrency' name='objectCurrency' type='hidden' value='<%= doc.currency %>' />
-                                                    <input id='objectCurrencySymbol' name='objectCurrencySymbol' type='text' style='text-align: center;' disabled="disabled" value='<%= doc.currencySymbol %>' />
+                                                    <input id='objectCurrency' name='objectCurrency' type='hidden' />
+                                                    <input id='objectCurrencySymbol' name='objectCurrencySymbol' type='text' style='text-align: center;' disabled="disabled" />
                                                 </td>
                                         </table>
                                         
                                         <label for='objectDescription'>Description</label> 
-                                        <textarea id='objectDescription' name='objectDescription'><%= doc.description %></textarea>
+                                        <textarea id='objectDescription' name='objectDescription'></textarea>
                                     </div>
                                 </div>
 
                                 <div class='form-commands-div'>
-                                    <button type='submit' class='submit-button'>Save</button>
+                                    <button type='submit' class='submit-button'>Create</button>
                                 </div>
                             </fieldset>
                         </form>

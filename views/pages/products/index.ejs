@@ -11,7 +11,7 @@
 	</header>
 
 	<main>
-        These are all your saved objects
+        These are all your saved products
         <br>
 
 		<% include ../../partials/toolbar %>
@@ -24,14 +24,8 @@
                 <th class='left-aligned'>
                     Name
                 </th>
-                <th>
-                    Old price
-                </th>
-                <th>
-                    New price
-                </th>
-                <th>
-                    Difference
+                <th colspan='3'>
+                    Price
                 </th>
                 <th>
                     Currency
@@ -50,24 +44,38 @@
                     <tr object-id='<%= objectslist[i]._id %>'>
                         <td style='text-align: center;' data-property='image'><img src='<%= objectslist[i].imageUrl %>' alt='objectslist[i].name '/></td>
                         <td class='left-aligned' data-property='name'><%= objectslist[i].name %></td>
-                        <td data-property='oldPrice'><%= objectslist[i].oldPrice %></td>
-                        <td data-property='newPrice'><%= objectslist[i].newPrice %></td>
-                        <td data-property='priceDifference '>
-                            <% if (objectslist[i].newPrice - objectslist[i].oldPrice < 0) { %>
-                                <span style='color: red; font-weight: bold;'><%= objectslist[i].newPrice - objectslist[i].oldPrice %></span>
+                        <% if (objectslist[i].newPrice - objectslist[i].oldPrice != 0) { %>
+                            <td data-property='newPrice' style='font-weight: bold'><%= objectslist[i].newPrice %></td>
+                            <td data-property='oldPrice'><%= objectslist[i].oldPrice %></td>
+                            <td data-property='priceDifference'>
+                                <span style='color: red; font-weight: bold;'>
+                                    <% if (objectslist[i].newPrice - objectslist[i].oldPrice > 0) { %>
+                                        <i class="fa fa-angle-up" aria-hidden="true"></i>
+                                    <% } else { %>
+                                        <i class="fa fa-angle-down" aria-hidden="true"></i>
+                                    <% } %>
+                                    <%= objectslist[i].newPrice - objectslist[i].oldPrice %>
+                                </span>
+                            </td>
                         <% } else { %>
-                                <%= objectslist[i].newPrice - objectslist[i].oldPrice %>
+                            <td data-property='price' colspan='3'><%= objectslist[i].newPrice %></td>
                         <% } %>
-                        </td>
-                        <td data-property='currency'><%= objectslist[i].currency %></td>
+                        <td data-property='currency'><%= objectslist[i].currencySymbol %></td>
                         <td data-property='website'><a href='<%= objectslist[i].objectUrl %>'><%= objectslist[i].website %></a></td>
                         <td data-property='description'><%= objectslist[i].description %></td>
-                        <td><a href='/objects/edit/<%= objectslist[i]._id %>'>Edit</a></td>
+                        <td>
+                            <a href='/products/edit/<%= objectslist[i]._id %>'>
+                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                            </a>
+                            <a href='javascript:void(0);' onclick="deleteProduct('<%= objectslist[i]._id %>')">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </a>
+                        </td>
                     </tr>
                 <% } %>
             <% } else { %>
                 <tr>
-                    <td colspan='6'> 
+                    <td colspan='9'> 
                         No data
                     </td>
                 </tr>

@@ -5,12 +5,14 @@
 </script>
 
 <div class='commands-div'>
-    <a class='command-button' href='/objects/create'>
-        + Add new price check object
+    <a class='command-button' href='/products/create'>
+        <i class="fa fa-plus" aria-hidden="true"></i> Add new price check object
     </a>
 
     <span class='toolbar-separator'></span>
 
     <input id="search-input" type='text' placeholder='Search...' />
-    <button class='submit-button' onclick="search('<%= search %>');">Search</button>
+    <button class='command-button' onclick="search('<%= search %>');">
+        <i class="fa fa-search" aria-hidden="true"></i>
+    </button>
 </div>
