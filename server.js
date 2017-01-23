@@ -15,11 +15,15 @@ $ = jQuery = require('jquery');
 
 require("./database/connection.js");
 var Product = require("./database/collections/productsCollection.js");
+var User = require("./database/collections/usersCollection.js");
 
 var core = require("./public/scripts/core.js");
 var currencies = require("./public/scripts/currencies.js");
 
 var cache = require("memory-cache");
+
+var bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -31,20 +35,30 @@ app.use(express.static(__dirname + '/images'));
 //deprecated in favor of a separate 'body-parser' module.
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// use res.render to load up an ejs view file
+function mid(req, res, next) {
+    var token = req.headers['x-access-token']
+    if (token) {
+        jwt.verify(token).then(decoded => {
+            next();
+        });
+        return;
+    }
+
+    res.redirect(401, '/login');
+}
 
 // index page 
-app.get('/', function(req, res) {
+app.get('/', mid, function(req, res) {
     res.render('pages/index');
 });
 
 // about page 
-app.get('/about', function(req, res) {
+app.get('/about', mid, function(req, res) {
     res.render('pages/about');
 });
 
 // objects index page 
-app.get('/products', function(req, res) {
+app.get('/products', mid, function(req, res) {
     var skip = parseInt(req.query.skip);
     if (!skip) {
         skip = 0;
@@ -101,7 +115,7 @@ app.get('/products', function(req, res) {
 });
 
 // objects create page 
-app.get('/products/edit/:id', function(req, res) {
+app.get('/products/edit/:id', mid, function(req, res) {
     var productId = req.params.id;
     Product.findOne({ '_id': productId }, function(err, doc) {
         if (doc) {
@@ -130,7 +144,7 @@ app.post('/products/edit/:id', function(req, res) {
 });
 
 // objects create page 
-app.get('/products/create', function(req, res) {
+app.get('/products/create', mid, function(req, res) {
     res.render('pages/products/create');
 });
 
@@ -168,18 +182,96 @@ app.post('/products/create', function(req, res) {
 
 });
 
-app.get("/products/delete/:id", function(req, res) {
+app.get("/products/delete/:id", mid, function(req, res) {
     var productId = req.params.id;
     Product.findByIdAndRemove({ '_id': productId }, function(err, doc) {
         res.redirect("/products");
     });
 });
 
-app.get("/analyzeObject", function(req, res) {
+app.get("/analyzeObject", mid, function(req, res) {
     var url = req.query.url;
     core.analyzeObject(url, function(result) {
         res.send(result);
     })
+});
+
+// get login page 
+app.get('/login', function(req, res) {
+    console.log(res.statusCode);
+    res.render('pages/login');
+});
+
+
+// post login 
+app.post('/login', function(req, res) {
+    // Get our form values. These rely on the "name" attributes
+    var username = req.body.username;
+    var password = req.body.password;
+    User.findOne({ 'username': username }, function(err, user) {
+        if (user) {
+            console.log("found user!");
+            // user.currencySymbol = currencySymbol;
+        } else {
+            console.log("not found user!");
+            // user = {};
+        }
+        // res.render('pages/products/edit', {
+        //     "user": user
+        // });
+    });
+    // // Submit to the DB
+    // new Product({
+    //     "name": objectName,
+    //     "objectUrl": objectUrl,
+    //     "oldPrice": objectOldPrice,
+    //     "newPrice": objectNewPrice,
+    //     "description": objectDescription,
+    //     "imageUrl": objectImageUrl,
+    //     "website": objectWebsite,
+    //     "currency": objectCurrency
+    // }).save(function(err, doc) {
+    //     if (err) {
+    //         // If it failed, return error
+    //         res.send("There was a problem adding the information to the database.");
+    //     } else {
+    //         // And forward to success page
+    //         res.redirect("/products");
+    //     }
+    // });
+});
+
+// get register page 
+app.get('/register', function(req, res) {
+    res.render('pages/register');
+});
+
+
+// post register 
+app.post('/register', function(req, res) {
+    // Get our form values. These rely on the "name" attributes
+    var username = req.body.username;
+    var password = req.body.password;
+    var email = req.body.email;
+    var firstName = req.body.firstName;
+    var lastName = req.body.lastName;
+
+    // Submit to the DB
+    new User({
+        "username": username,
+        "password": password,
+        "email": email,
+        "firstName": firstName,
+        "lastName": lastName
+    }).save(function(err, doc) {
+        if (err) {
+            // If it failed, return error
+            res.send("There was a problem registering the user.");
+        } else {
+            // And forward to success page
+            res.redirect("/login");
+        }
+    });
 });
 
 app.listen(8080);

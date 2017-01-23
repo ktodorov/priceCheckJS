@@ -12,6 +12,6 @@ var priceCheckDbSchema = new mongoose.Schema({
 }, { collection: "priceCheckObjectsCollection" });
 
 priceCheckDbSchema.index({ name: 'text' });
-var productsCollection = mongoose.model('PriceCheckObjectsCollection', priceCheckDbSchema);
+var productsCollection = mongoose.model('Product', priceCheckDbSchema, "priceCheckObjectsCollection");
 
 module.exports = productsCollection;
