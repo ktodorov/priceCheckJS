@@ -6,9 +6,10 @@ var usersDbSchema = new mongoose.Schema({
     email: String,
     firstName: String,
     lastName: String,
-}, { collection: "priceCheckObjectsCollection" });
+    products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }]
+});
 
 usersDbSchema.index({ name: 'text' });
-var usersCollection = mongoose.model('User', usersDbSchema, "priceCheckObjectsCollection");
+var usersCollection = mongoose.model('User', usersDbSchema);
 
 module.exports = usersCollection;

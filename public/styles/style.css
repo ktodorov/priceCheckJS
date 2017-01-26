@@ -248,3 +248,18 @@ span.toolbar-separator {
 #search-input {
     height: 30px;
 }
+
+.user-panel {
+    float: right;
+}
+
+.user-panel a {
+    padding: 15px 0;
+    display: block;
+    color: #18e;
+}
+
+.user-panel a:hover {
+    text-decoration: none;
+    color: #15a;
+}

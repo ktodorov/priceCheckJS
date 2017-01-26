@@ -8,10 +8,13 @@ var priceCheckDbSchema = new mongoose.Schema({
     description: String,
     imageUrl: String,
     website: String,
-    currency: Number
-}, { collection: "priceCheckObjectsCollection" });
+    currency: Number,
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    dateCreated: Date,
+    datePriceChanged: Date
+});
 
 priceCheckDbSchema.index({ name: 'text' });
-var productsCollection = mongoose.model('Product', priceCheckDbSchema, "priceCheckObjectsCollection");
+var productsCollection = mongoose.model('Product', priceCheckDbSchema);
 
 module.exports = productsCollection;

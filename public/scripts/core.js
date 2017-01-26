@@ -3,6 +3,10 @@ var currencies = require("./currencies.js");
 var websiteAnalyzers = require("./websiteAnalyzers.js");
 
 function getWebsiteFromUrl(urlString, includeFamilyWebsites) {
+    if (!urlString) {
+        return;
+    }
+
     var hostnames = urlString.match(/^http:\/\/[^/]+/);
     if (!hostnames || hostnames.length == 0) {
         hostnames = urlString.match(/^https:\/\/[^/]+/);
@@ -56,6 +60,10 @@ function parseDocRecursively(cache, callbackFunction) {
     var currentDocNumber = cache.get("docsParsed");
 
     var analyzer = websiteAnalyzers.getAnalyzerFromUrl(cache.get("docs")[currentDocNumber].objectUrl);
+    if (!analyzer) {
+        callbackFunction(cache.get("docs"));
+        return;
+    }
     analyzer.getHtmlFromUrl(function() {
         var currentDoc = cache.get("docs")[currentDocNumber];
         try {
