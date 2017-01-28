@@ -45,7 +45,11 @@ app.use(cookieSession({
 
 // get login page 
 app.get('/login', function(req, res) {
-    res.render('pages/login');
+    if (authenticationHelper.isUserLoggedIn(req)) {
+        res.redirect("/products");
+    } else {
+        res.render('pages/login');
+    }
 });
 
 // post login 

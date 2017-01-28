@@ -21,22 +21,29 @@ function getTokenForUser(user) {
     return token;
 }
 
-function requireAuthentication(req, res, next) {
+function isUserLoggedIn(req, callbackFunc) {
     if (req.session.accessToken == null) {
-        res.redirect('/login');
+        return false;
+    }
+
+    var decoded = jwt.verify(req.session.accessToken, tokenSecret);
+    if (decoded) {
+        return true;
+    }
+
+    return false;
+}
+
+function requireAuthentication(req, res, next) {
+    if (isUserLoggedIn(req)) {
+        next();
     } else {
-        jwt.verify(req.session.accessToken, tokenSecret, function(err, decoded) {
-            if (decoded) {
-                next();
-            } else {
-                res.redirect('/login');
-            }
-        });
+        res.redirect('/login');
     }
 }
 
 function comparePasswords(plainPassword, hashedPassword) {
-    var areEqual = bcrypt.compareSync(req.body.password, user.password);
+    var areEqual = bcrypt.compareSync(plainPassword, hashedPassword);
     return areEqual;
 }
 
@@ -62,3 +69,4 @@ exports.requireAuthentication = requireAuthentication;
 exports.comparePasswords = comparePasswords;
 exports.hashPassword = hashPassword;
 exports.logUser = logUser;
+exports.isUserLoggedIn = isUserLoggedIn;
