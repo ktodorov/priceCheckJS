@@ -1,6 +1,7 @@
 var websites = require("./websites.js");
 var currencies = require("./currencies.js");
 var websiteAnalyzers = require("./websiteAnalyzers.js");
+var authenticationHelper = require("./helpers/authenticationHelper.js");
 
 function getWebsiteFromUrl(urlString, includeFamilyWebsites) {
     if (!urlString) {
@@ -129,8 +130,29 @@ function analyzeObject(url, callbackFunction) {
     });
 }
 
+function constructSearchOptions(searchText, accessToken) {
+    var searchOptions = {};
+    var currentUserId = authenticationHelper.getLoggedUserId(accessToken);
+
+    if (!searchText) {
+        searchOptions = {
+            user: currentUserId
+        };
+    } else {
+        searchOptions = {
+            $text: {
+                $search: searchText
+            },
+            user: currentUserId
+        }
+    }
+
+    return searchOptions;
+}
+
 exports.getWebsiteFromUrl = getWebsiteFromUrl;
 exports.getNumberFromString = getNumberFromString;
 exports.guid = guid;
 exports.parseDocRecursively = parseDocRecursively;
 exports.analyzeObject = analyzeObject;
+exports.constructSearchOptions = constructSearchOptions;

@@ -27,37 +27,21 @@ var User = require("./database/collections/usersCollection.js");
 var core = require("./public/scripts/core.js");
 var currencies = require("./public/scripts/currencies.js");
 
+var authenticationHelper = require("./public/scripts/helpers/authenticationHelper.js");
+
 var cache = require("memory-cache");
-
-var bcrypt = require('bcrypt');
-const saltRounds = 10;
-
-var jwt = require("jsonwebtoken");
-var tokenSecret = 'secret';
-
 
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/images'));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.set('trust proxy', 1) // trust first proxy
+// app.set('trust proxy', 1) // trust first proxy
 
 app.use(cookieSession({
     name: 'session',
     keys: ['key1', 'key2']
-}))
-
-function getLoggedUserId(token) {
-    console.log("token is ", token);
-    if (token) {
-        var decoded = jwt.verify(token, tokenSecret);
-        console.log("decoded is ", decoded);
-        if (decoded._id) {
-            return decoded._id
-        }
-    }
-}
+}));
 
 // get login page 
 app.get('/login', function(req, res) {
@@ -67,17 +51,9 @@ app.get('/login', function(req, res) {
 // post login 
 app.post('/login', function(req, res) {
     // Get our form values. These rely on the "name" attributes
-    var username = req.body.username;
-    var password = req.body.password;
-    User.findOne({ 'username': username }, function(err, user) {
+    User.findOne({ 'username': req.body.username }, function(err, user) {
         if (user) {
-            if (bcrypt.compareSync(password, user.password)) {
-                var token = jwt.sign({ _id: user._id }, tokenSecret, {
-                    expiresIn: '24h'
-                });
-
-                req.session.accessToken = token;
-                req.session.currentUsername = user.username;
+            if (authenticationHelper.logUser(req, res, user)) {
                 res.redirect("/products");
             } else {
                 res.send("Invalid password!");
@@ -99,69 +75,50 @@ app.get('/register', function(req, res) {
 // post register 
 app.post('/register', function(req, res) {
     // Get our form values. These rely on the "name" attributes
-    var username = req.body.username;
     var password = req.body.password;
     var confirmPassword = req.body.confirmPassword;
     if (password != confirmPassword) {
         res.send("Password and confirm password are not equal!");
         return;
     }
-    var email = req.body.email;
-    var firstName = req.body.firstName;
-    var lastName = req.body.lastName;
 
-    var hashedPasword = bcrypt.hashSync(password, saltRounds);
-
+    var hashedPasword = authenticationHelper.hashPassword(password);
     // Submit to the DB
     new User({
-        "username": username,
+        "username": req.body.username,
         "password": hashedPasword,
-        "email": email,
-        "firstName": firstName,
-        "lastName": lastName
+        "email": req.body.email,
+        "firstName": req.body.firstName,
+        "lastName": req.body.lastName
     }).save(function(err, doc) {
         if (err) {
             // If it failed, return error
             res.send("There was a problem registering the user.");
         } else {
-            console.log("saved - ", doc)
-                // And forward to success page
+            // And forward to success page
             res.redirect("/login");
         }
     });
 });
 
-app.get('/logout', requireAuthentication, function(req, res) {
+app.get('/logout', authenticationHelper.requireAuthentication, function(req, res) {
     req.session = null;
     res.redirect("/login");
 });
 
-function requireAuthentication(req, res, next) {
-    if (req.session.accessToken == null) {
-        res.redirect('/login');
-    } else {
-        jwt.verify(req.session.accessToken, tokenSecret, function(err, decoded) {
-            if (decoded) {
-                next();
-            } else {
-                res.redirect('/login');
-            }
-        });
-    }
-}
 
 // index page 
-app.get('/', requireAuthentication, function(req, res) {
+app.get('/', authenticationHelper.requireAuthentication, function(req, res) {
     res.render('pages/index');
 });
 
 // about page 
-app.get('/about', requireAuthentication, function(req, res) {
+app.get('/about', authenticationHelper.requireAuthentication, function(req, res) {
     res.render('pages/about');
 });
 
 // objects index page 
-app.get('/products', requireAuthentication, function(req, res) {
+app.get('/products', authenticationHelper.requireAuthentication, function(req, res) {
     var skip = parseInt(req.query.skip);
     if (!skip) {
         skip = 0;
@@ -173,22 +130,7 @@ app.get('/products', requireAuthentication, function(req, res) {
 
     var searchText = req.query.search;
     var queryOptions = { skip: skip, limit: take };
-    var searchOptions = {};
-    var currentUserId = getLoggedUserId(req.session.accessToken);
-
-    if (!searchText) {
-        searchOptions = {
-            user: currentUserId
-        };
-    } else {
-        searchOptions = {
-            $text: {
-                $search: searchText
-            },
-            user: currentUserId
-        }
-    }
-
+    var searchOptions = core.constructSearchOptions(searchText, req.session.accessToken);
     Product.count(searchOptions, function(error, docsCount) {
         Product.find(searchOptions).skip(skip).limit(take).exec(function(err, docs) {
             try {
@@ -224,7 +166,7 @@ app.get('/products', requireAuthentication, function(req, res) {
 });
 
 // objects create page 
-app.get('/products/edit/:id', requireAuthentication, function(req, res) {
+app.get('/products/edit/:id', authenticationHelper.requireAuthentication, function(req, res) {
     var productId = req.params.id;
     Product.findOne({ '_id': productId }, function(err, doc) {
         if (doc) {
@@ -239,7 +181,7 @@ app.get('/products/edit/:id', requireAuthentication, function(req, res) {
     });
 });
 
-app.post('/products/edit/:id', requireAuthentication, function(req, res) {
+app.post('/products/edit/:id', authenticationHelper.requireAuthentication, function(req, res) {
     var productId = req.params.id;
 
     var updatedProduct = {
@@ -253,34 +195,24 @@ app.post('/products/edit/:id', requireAuthentication, function(req, res) {
 });
 
 // objects create page 
-app.get('/products/create', requireAuthentication, function(req, res) {
+app.get('/products/create', authenticationHelper.requireAuthentication, function(req, res) {
     res.render('pages/products/create');
 });
 
 // objects create page 
-app.post('/products/create', requireAuthentication, function(req, res) {
+app.post('/products/create', authenticationHelper.requireAuthentication, function(req, res) {
     // Get our form values. These rely on the "name" attributes
-    var objectName = req.body.objectName;
-    var objectUrl = req.body.objectUrl;
-    var objectDescription = req.body.objectDescription;
-    var objectOldPrice = req.body.objectPrice;
-    var objectNewPrice = req.body.objectPrice;
-    var objectImageUrl = req.body.imageUrl;
-    var objectWebsite = req.body.website;
-    var objectCurrency = req.body.objectCurrency;
-    var currentUserId = getLoggedUserId(req.session.accessToken);
-    console.log("current user id is ", currentUserId);
-
+    var currentUserId = authenticationHelper.getLoggedUserId(req.session.accessToken);
     // Submit to the DB
     new Product({
-        "name": objectName,
-        "objectUrl": objectUrl,
-        "oldPrice": objectOldPrice,
-        "newPrice": objectNewPrice,
-        "description": objectDescription,
-        "imageUrl": objectImageUrl,
-        "website": objectWebsite,
-        "currency": objectCurrency,
+        "name": req.body.objectName,
+        "objectUrl": req.body.objectUrl,
+        "oldPrice": req.body.objectPrice,
+        "newPrice": req.body.objectPrice,
+        "description": req.body.objectDescription,
+        "imageUrl": req.body.imageUrl,
+        "website": req.body.website,
+        "currency": req.body.objectCurrency,
         "dateCreated": new Date(),
         "user": currentUserId
     }).save(function(err, doc) {
@@ -295,19 +227,24 @@ app.post('/products/create', requireAuthentication, function(req, res) {
 
 });
 
-app.get("/products/delete/:id", requireAuthentication, function(req, res) {
+app.get("/products/delete/:id", authenticationHelper.requireAuthentication, function(req, res) {
     var productId = req.params.id;
     Product.findByIdAndRemove({ '_id': productId }, function(err, doc) {
         res.redirect("/products");
     });
 });
 
-app.get("/analyzeObject", requireAuthentication, function(req, res) {
+app.get("/analyzeObject", authenticationHelper.requireAuthentication, function(req, res) {
     var url = req.query.url;
     core.analyzeObject(url, function(result) {
         res.send(result);
     })
 });
+
+app.get("/getUsername", authenticationHelper.requireAuthentication, function(req, res) {
+    var username = req.session.currentUsername;
+    res.send(username);
+})
 
 app.listen(8080);
 console.log('Application started on 8080 port');

@@ -1,8 +1,3 @@
-body {
-    padding-top: 50px;
-}
-
-
 /* Grid Table styles */
 
 .grid-table {
@@ -249,17 +244,7 @@ span.toolbar-separator {
     height: 30px;
 }
 
-.user-panel {
-    float: right;
-}
-
-.user-panel a {
-    padding: 15px 0;
-    display: block;
-    color: #18e;
-}
-
-.user-panel a:hover {
-    text-decoration: none;
-    color: #15a;
+.username-link {
+    color: #18e !important;
+    font-weight: bold;
 }

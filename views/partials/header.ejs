@@ -1,6 +1,18 @@
+<script>
+    $(document).ready(function() {
+        $.ajax({
+            url: "/getUsername",
+            type: "GET",
+            success: function(data) {
+                $(".username-link").text(data);
+            }
+        })
+    })
+</script>
+
 <!-- views/partials/header.ejs -->
 
-<nav class="navbar navbar-default" role="navigation">
+<nav class="navbar navbar-default navbar-static-top" role="navigation">
     <div class="container-fluid">
 
         <div class="navbar-header">
@@ -10,14 +22,20 @@
             </a>
         </div>
 
-        <ul class="nav navbar-nav">
+        <ul class="nav navbar-nav navbar-left">
             <li><a href="/">Home</a></li>
             <li><a href="/products">Products</a></li>
             <li><a href="/about">About</a></li>
         </ul>
       
-        <div class='user-panel'>
-            <a href='/logout'>Logout</a>
-        </div>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+                <a class='username-link dropdown-toggle' data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="true">
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href='/logout'>Logout</a></li>
+                </ul>
+            </li>
+        </ul>
     </div>
 </nav>
