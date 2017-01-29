@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="/scripts/objects.js"></script>
 	<% include ../../partials/head %>
+    <script src="/scripts/objects.js"></script>
 </head>
 <body class="container">
 
@@ -37,6 +37,9 @@
                     Description
                 </th>
                 <th>
+                    Last updated
+                </th>
+                <th>
                 </th>
             </tr>
             <% if (objectslist && objectslist.length > 0) { %>
@@ -63,6 +66,7 @@
                         <td data-property='currency'><%= objectslist[i].currencySymbol %></td>
                         <td data-property='website'><a href='<%= objectslist[i].objectUrl %>'><%= objectslist[i].website %></a></td>
                         <td data-property='description'><%= objectslist[i].description %></td>
+                        <td data-property='lastChecked' data-value='<%= objectslist[i].lastChecked %>'></td>
                         <td>
                             <a href='/products/edit/<%= objectslist[i]._id %>'>
                                 <i class="fa fa-pencil" aria-hidden="true"></i>

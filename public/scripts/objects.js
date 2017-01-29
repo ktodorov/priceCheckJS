@@ -101,3 +101,18 @@ function deleteProduct(productId) {
         window.location.href = window.location.href + "/delete/" + productId
     }
 }
+
+function formatDate(date) {
+    return ("0" + date.getDate()).slice(-2) + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
+        date.getFullYear() + " " + ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
+}
+
+$(document).ready(function() {
+    debugger;
+    var lastCheckedObjects = $("td[data-property='lastChecked']");
+    lastCheckedObjects.each(function(index) {
+        var dataValue = $(this).attr("data-value");
+        var formattedDataValue = formatDate(new Date(dataValue));
+        $(this).text(formattedDataValue);
+    }, this);
+})

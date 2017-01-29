@@ -123,10 +123,10 @@ app.get('/products', authenticationHelper.requireAuthentication, function(req, r
     var searchText = req.query.search;
     var queryOptions = { skip: skip, limit: take };
     var searchOptions = core.constructSearchOptions(searchText, req.session.accessToken);
-    Product.count(searchOptions, function(error, docsCount) {
-        Product.find(searchOptions).skip(skip).limit(take).exec(function(err, docs) {
+    Product.count(searchOptions, function(error, productsCount) {
+        Product.find(searchOptions).skip(skip).limit(take).exec(function(err, products) {
             try {
-                if (!docs || docs.length == 0) {
+                if (!products || products.length == 0) {
                     res.render('pages/products/index', {
                         "objectslist": [],
                         "objectsCount": 0,
@@ -135,21 +135,28 @@ app.get('/products', authenticationHelper.requireAuthentication, function(req, r
                         "search": searchText
                     });
                     return;
-
                 }
 
-                cache.put("docsLength", docs.length);
-                cache.put("docsParsed", 0);
-                cache.put("docs", docs);
-                core.parseDocRecursively(cache, function(parsedDocs) {
-                    res.render('pages/products/index', {
-                        "objectslist": parsedDocs,
-                        "objectsCount": docsCount,
-                        "skip": skip,
-                        "take": take,
-                        "search": searchText
+                cache.put("productsLength", products.length);
+                cache.put("productsParsed", 0);
+                cache.put("products", products);
+                core.parseDocRecursively(cache, function(product) {
+                        var upsertData = product.toObject();
+                        delete upsertData._id;
+                        upsertData.lastChecked = new Date();
+                        Product.findOneAndUpdate({ _id: product._id }, upsertData, { upsert: true }, function(error, result) {
+                            product = result;
+                        });
+                    },
+                    function(parsedProducts) {
+                        res.render('pages/products/index', {
+                            "objectslist": parsedProducts,
+                            "objectsCount": productsCount,
+                            "skip": skip,
+                            "take": take,
+                            "search": searchText
+                        });
                     });
-                });
             } catch (e) {
                 console.log("error occured: ", e);
             }
@@ -206,7 +213,8 @@ app.post('/products/create', authenticationHelper.requireAuthentication, functio
         "website": req.body.website,
         "currency": req.body.objectCurrency,
         "dateCreated": new Date(),
-        "user": currentUserId
+        "user": currentUserId,
+        "lastChecked": new Date()
     }).save(function(err, doc) {
         if (err) {
             // If it failed, return error

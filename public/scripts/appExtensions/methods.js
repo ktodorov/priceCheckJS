@@ -1,3 +1,5 @@
+var core = require("../core.js");
+
 module.exports = function(app, midFunc) {
     app.get("/analyzeObject", midFunc, function(req, res) {
         var url = req.query.url;

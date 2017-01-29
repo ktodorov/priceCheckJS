@@ -11,7 +11,8 @@ var priceCheckDbSchema = new mongoose.Schema({
     currency: Number,
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     dateCreated: Date,
-    datePriceChanged: Date
+    datePriceChanged: Date,
+    lastChecked: Date
 });
 
 priceCheckDbSchema.index({ name: 'text' });

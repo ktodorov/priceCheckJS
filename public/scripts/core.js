@@ -57,50 +57,65 @@ function is_server() {
     return (typeof process === 'object' && process + '' === '[object process]');
 }
 
-function parseDocRecursively(cache, callbackFunction) {
-    var currentDocNumber = cache.get("docsParsed");
+function parseDocRecursively(cache, updatedProductFunction, callbackFunction) {
+    var currentProductNumber = cache.get("productsParsed");
+    var currentDate = new Date();
+    var currentProductLastCheckedDate = cache.get("products")[currentProductNumber].lastChecked;
 
-    var analyzer = websiteAnalyzers.getAnalyzerFromUrl(cache.get("docs")[currentDocNumber].objectUrl);
-    if (!analyzer) {
-        callbackFunction(cache.get("docs"));
-        return;
-    }
-    analyzer.getHtmlFromUrl(function() {
-        var currentDoc = cache.get("docs")[currentDocNumber];
-        try {
-            var website = getWebsiteFromUrl(currentDoc.objectUrl, false);
-            var currencySymbol = currencies.getCurrencySymbol(currentDoc.currency);
-            currentDoc.website = website;
-            currentDoc.currencySymbol = currencySymbol;
+    if (!currentProductLastCheckedDate || (currentDate - currentProductLastCheckedDate > 3600000)) { // 3,600,000 milliseconds = 60 minutes
+        var analyzer = websiteAnalyzers.getAnalyzerFromUrl(cache.get("products")[currentProductNumber].objectUrl);
+        if (!analyzer) {
+            callbackFunction(cache.get("products"));
+            return;
+        }
+        analyzer.getHtmlFromUrl(function() {
+            var currentProduct = cache.get("products")[currentProductNumber];
+            try {
+                var website = getWebsiteFromUrl(currentProduct.objectUrl, false);
+                var currencySymbol = currencies.getCurrencySymbol(currentProduct.currency);
+                currentProduct.website = website;
+                currentProduct.currencySymbol = currencySymbol;
 
-            var price = analyzer.getPrice();
-            if (price && price != currentDoc.newPrice) {
-                currentDoc.newPrice = price;
+                var price = analyzer.getPrice();
+                if (price && price != currentProduct.newPrice) {
+                    currentProduct.newPrice = price;
+                }
+
+                var imageUrl = analyzer.getImageUrl()
+                currentProduct.imageUrl = imageUrl;
+            } catch (err) {
+                console.log("error occured: ", err);
             }
 
-            var imageUrl = analyzer.getImageUrl()
-            currentDoc.imageUrl = imageUrl;
-        } catch (err) {
-            console.log("error occured: ", err);
-        }
+            var products = cache.get("products");
+            products[currentProductNumber] = currentProduct;
+            cache.put("products", products);
 
-        var docs = cache.get("docs");
-        docs[currentDocNumber] = currentDoc;
-        cache.put("docs", docs);
+            var productsParsed = cache.get("productsParsed");
+            productsParsed += 1;
+            cache.put("productsParsed", productsParsed);
+            var productsLength = cache.get("productsLength");
 
+            updatedProductFunction(currentProduct);
+            if (productsParsed >= productsLength) {
+                callbackFunction(cache.get("products"));
+            } else {
+                parseDocRecursively(cache, updatedProductFunction, callbackFunction);
+            }
 
-        var docsParsed = cache.get("docsParsed");
-        docsParsed += 1;
-        cache.put("docsParsed", docsParsed);
-        var docsLength = cache.get("docsLength");
+        }.bind(this))
+    } else {
+        var productsParsed = cache.get("productsParsed");
+        productsParsed += 1;
+        cache.put("productsParsed", productsParsed);
+        var productsLength = cache.get("productsLength");
 
-        if (docsParsed >= docsLength) {
-            callbackFunction(cache.get("docs"));
+        if (productsParsed >= productsLength) {
+            callbackFunction(cache.get("products"));
         } else {
-            parseDocRecursively(cache, callbackFunction);
+            parseDocRecursively(cache, updatedProductFunction, callbackFunction);
         }
-
-    }.bind(this))
+    }
 }
 
 function analyzeObject(url, callbackFunction) {
