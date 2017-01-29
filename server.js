@@ -6,10 +6,8 @@ var app = express();
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
-var bodyParser = require('body-parser');
-// var session = require('express-session');
-// var cookieParser = require('cookie-parser');
-var cookieSession = require('cookie-session');
+// var bodyParser = require('body-parser');
+// var cookieSession = require('cookie-session');
 
 require('babel-core/register');
 
@@ -31,17 +29,7 @@ var authenticationHelper = require("./public/scripts/helpers/authenticationHelpe
 
 var cache = require("memory-cache");
 
-app.use(express.static(__dirname + '/public'));
-app.use(express.static(__dirname + '/images'));
-
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// app.set('trust proxy', 1) // trust first proxy
-
-app.use(cookieSession({
-    name: 'session',
-    keys: ['key1', 'key2']
-}));
+require("./public/scripts/appExtensions/requirements.js")(app, express, __dirname);
 
 // get login page 
 app.get('/login', function(req, res) {
@@ -238,17 +226,7 @@ app.get("/products/delete/:id", authenticationHelper.requireAuthentication, func
     });
 });
 
-app.get("/analyzeObject", authenticationHelper.requireAuthentication, function(req, res) {
-    var url = req.query.url;
-    core.analyzeObject(url, function(result) {
-        res.send(result);
-    })
-});
-
-app.get("/getUsername", authenticationHelper.requireAuthentication, function(req, res) {
-    var username = req.session.currentUsername;
-    res.send(username);
-})
+require("./public/scripts/appExtensions/methods.js")(app, authenticationHelper.requireAuthentication);
 
 app.listen(8080);
 console.log('Application started on 8080 port');

@@ -244,7 +244,70 @@ span.toolbar-separator {
     height: 30px;
 }
 
+.navbar-nav li a {
+    font-family: "Segoe UI", sans-serif;
+    text-transform: uppercase;
+    font-weight: 600;
+    vertical-align: middle;
+}
+
+.navbar-header span {
+    font-family: "Segoe UI", sans-serif;
+    color: #18e !important;
+}
+
 .username-link {
     color: #18e !important;
-    font-weight: bold;
+    font-weight: bold !important;
+}
+
+
+/* Login page */
+
+.login-div,
+.register-div {
+    width: 500px;
+    margin: 0 auto;
+    margin-bottom: 15px;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-top: 0px;
+    border-radius: 0 !important;
+}
+
+.login-div h2,
+.register-div h2 {
+    font-family: "Segoe UI", sans-serif;
+    color: #18e;
+    font-weight: 700;
+}
+
+.input-panel {
+    padding: 5px 0;
+}
+
+.input-panel label {
+    display: block;
+    width: 100%;
+    color: #555;
+    font-family: "Segoe UI", sans-serif;
+    font-weight: 500;
+}
+
+.input-panel input {
+    width: 100%;
+    height: 30px;
+    border: 1px solid #ddd;
+}
+
+.input-panel button[type='submit'] {
+    background: #18e;
+    color: white;
+    padding: 5px 10px;
+    min-width: 100px;
+    border: 1px solid #17d;
+}
+
+.input-panel button[type='submit']:hover {
+    background: #17d;
 }

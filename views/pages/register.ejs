@@ -5,40 +5,49 @@
 </head>
 <body class="container">
 	<main>
-		<div class="jumbotron">
-			<h1>Register</h1>
+		<div class="jumbotron register-div">
+			<div class='input-panel'>
+				<a href='/login'>
+					<i class="fa fa-angle-left" aria-hidden="true"></i>
+					Go back to login page
+				</a>
+			</div>
+
+			<h2>SIGN UP</h2>
 			<form method='post' action='/register'>
-				<div>
+				<div class='input-panel'>
 					<label for='username'>Username</label>
 					<input id='username' name='username' type='text' />
 				</div>
 				
-				<div>
+				<div class='input-panel'>
 					<label for='password'>Password</label>
 					<input id='password' name='password' type='password' />
 				</div>
 				
-				<div>
+				<div class='input-panel'>
 					<label for='confirmPassword'>Confirm password</label>
 					<input id='confirmPassword' name='confirmPassword' type='password' />
 				</div>
 				
-				<div>
+				<div class='input-panel'>
 					<label for='email'>Email address</label>
 					<input id='email' name='email' type='text' />
 				</div>
 				
-				<div>
+				<div class='input-panel'>
 					<label for='firstName'>First name</label>
 					<input id='firstName' name='firstName' type='text' />
 				</div>
 				
-				<div>
+				<div class='input-panel'>
 					<label for='lastName'>Last name</label>
 					<input id='lastName' name='lastName' type='text' />
 				</div>
-
-				<button type='submit'>Register</button>
+				
+				<div class='input-panel'>
+					<button type='submit'>Register</button>
+				</div>
 			</form>
 		</div>
 	</main>
