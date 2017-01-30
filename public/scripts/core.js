@@ -2,6 +2,7 @@ var websites = require("./websites.js");
 var currencies = require("./currencies.js");
 var websiteAnalyzers = require("./websiteAnalyzers.js");
 var authenticationHelper = require("./helpers/authenticationHelper.js");
+var Product = require("../../database/collections/productsCollection.js");
 
 function getWebsiteFromUrl(urlString, includeFamilyWebsites) {
     if (!urlString) {
@@ -57,38 +58,58 @@ function is_server() {
     return (typeof process === 'object' && process + '' === '[object process]');
 }
 
-function parseDocRecursively(cache, updatedProductFunction, callbackFunction) {
-    var currentProductNumber = cache.get("productsParsed");
-    var currentDate = new Date();
-    var currentProductLastCheckedDate = cache.get("products")[currentProductNumber].lastChecked;
-
-    if (!currentProductLastCheckedDate || (currentDate - currentProductLastCheckedDate > 3600000)) { // 3,600,000 milliseconds = 60 minutes
-        var analyzer = websiteAnalyzers.getAnalyzerFromUrl(cache.get("products")[currentProductNumber].objectUrl);
-        if (!analyzer) {
-            callbackFunction(cache.get("products"));
-            return;
-        }
-        analyzer.getHtmlFromUrl(function() {
-            var currentProduct = cache.get("products")[currentProductNumber];
-            try {
-                var website = getWebsiteFromUrl(currentProduct.objectUrl, false);
-                var currencySymbol = currencies.getCurrencySymbol(currentProduct.currency);
-                currentProduct.website = website;
-                currentProduct.currencySymbol = currencySymbol;
-
-                var price = analyzer.getPrice();
-                if (price && price != currentProduct.newPrice) {
-                    currentProduct.newPrice = price;
-                }
-
-                var imageUrl = analyzer.getImageUrl()
-                currentProduct.imageUrl = imageUrl;
-            } catch (err) {
-                console.log("error occured: ", err);
+function refreshProduct(product, callbackFunction) {
+    var currentProduct = product;
+    var analyzer = websiteAnalyzers.getAnalyzerFromUrl(currentProduct.objectUrl);
+    if (!analyzer) {
+        callbackFunction(null);
+        return;
+    }
+    analyzer.getHtmlFromUrl(function() {
+        try {
+            var price = analyzer.getPrice();
+            if (price && price != currentProduct.newPrice) {
+                currentProduct.newPrice = price;
             }
 
+            var imageUrl = analyzer.getImageUrl()
+            currentProduct.imageUrl = imageUrl;
+
+            // Save updated product in database
+            var upsertData = currentProduct.toObject();
+            delete upsertData._id;
+            upsertData.lastChecked = new Date();
+            Product.findOneAndUpdate({ _id: currentProduct._id }, upsertData, { new: true }, function(error, result) {
+                callbackFunction(result);
+            });
+        } catch (err) {
+            console.log("error occured: ", err);
+        }
+    }.bind(this));
+}
+
+function populateTemporaryFields(product) {
+    var website = getWebsiteFromUrl(product.objectUrl, false);
+    var currencySymbol = currencies.getCurrencySymbol(product.currency);
+    product.website = website;
+    product.currencySymbol = currencySymbol;
+}
+
+function parseDocRecursively(cache, callbackFunction) {
+    var currentProductNumber = cache.get("productsParsed");
+    var currentDate = new Date();
+    var currentProduct = cache.get("products")[currentProductNumber];
+    var currentProductLastCheckedDate = currentProduct.lastChecked;
+
+    if (!currentProductLastCheckedDate || (currentDate - currentProductLastCheckedDate > 3600000)) { // 3,600,000 milliseconds = 60 minutes
+        refreshProduct(currentProduct, function(updatedProduct) {
+            if (!updatedProduct) {
+                callbackFunction(cache.get("products"));
+            }
+
+            populateTemporaryFields(updatedProduct);
             var products = cache.get("products");
-            products[currentProductNumber] = currentProduct;
+            products[currentProductNumber] = updatedProduct;
             cache.put("products", products);
 
             var productsParsed = cache.get("productsParsed");
@@ -96,15 +117,18 @@ function parseDocRecursively(cache, updatedProductFunction, callbackFunction) {
             cache.put("productsParsed", productsParsed);
             var productsLength = cache.get("productsLength");
 
-            updatedProductFunction(currentProduct);
             if (productsParsed >= productsLength) {
                 callbackFunction(cache.get("products"));
             } else {
-                parseDocRecursively(cache, updatedProductFunction, callbackFunction);
+                parseDocRecursively(cache, callbackFunction);
             }
-
-        }.bind(this))
+        });
     } else {
+        populateTemporaryFields(currentProduct);
+        var products = cache.get("products");
+        products[currentProductNumber] = currentProduct;
+        cache.put("products", products);
+
         var productsParsed = cache.get("productsParsed");
         productsParsed += 1;
         cache.put("productsParsed", productsParsed);
@@ -113,7 +137,7 @@ function parseDocRecursively(cache, updatedProductFunction, callbackFunction) {
         if (productsParsed >= productsLength) {
             callbackFunction(cache.get("products"));
         } else {
-            parseDocRecursively(cache, updatedProductFunction, callbackFunction);
+            parseDocRecursively(cache, callbackFunction);
         }
     }
 }
@@ -171,3 +195,4 @@ exports.guid = guid;
 exports.parseDocRecursively = parseDocRecursively;
 exports.analyzeObject = analyzeObject;
 exports.constructSearchOptions = constructSearchOptions;
+exports.refreshProduct = refreshProduct;

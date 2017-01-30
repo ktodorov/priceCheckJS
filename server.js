@@ -140,14 +140,7 @@ app.get('/products', authenticationHelper.requireAuthentication, function(req, r
                 cache.put("productsLength", products.length);
                 cache.put("productsParsed", 0);
                 cache.put("products", products);
-                core.parseDocRecursively(cache, function(product) {
-                        var upsertData = product.toObject();
-                        delete upsertData._id;
-                        upsertData.lastChecked = new Date();
-                        Product.findOneAndUpdate({ _id: product._id }, upsertData, { upsert: true }, function(error, result) {
-                            product = result;
-                        });
-                    },
+                core.parseDocRecursively(cache,
                     function(parsedProducts) {
                         res.render('pages/products/index', {
                             "objectslist": parsedProducts,

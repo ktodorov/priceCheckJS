@@ -108,7 +108,6 @@ function formatDate(date) {
 }
 
 $(document).ready(function() {
-    debugger;
     var lastCheckedObjects = $("td[data-property='lastChecked']");
     lastCheckedObjects.each(function(index) {
         var dataValue = $(this).attr("data-value");
@@ -116,3 +115,21 @@ $(document).ready(function() {
         $(this).text(formattedDataValue);
     }, this);
 })
+
+function refreshProduct(button, productId) {
+    $.ajax({
+        url: "/refreshProduct",
+        data: {
+            productId: productId
+        },
+        type: "GET",
+        success: function(updatedProduct) {
+            debugger;
+            if (!updatedProduct) {
+                return;
+            }
+            $(button).closest("tr").find("td[data-property='name']").text(updatedProduct.name);
+            $(button).closest("tr").find("td[data-property='lastChecked']").text(formatDate(new Date(updatedProduct.lastChecked)));
+        }
+    });
+}

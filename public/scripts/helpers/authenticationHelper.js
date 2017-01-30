@@ -48,7 +48,7 @@ function comparePasswords(plainPassword, hashedPassword) {
 }
 
 function hashPassword(plainPassword) {
-    var hashedPasword = bcrypt.hashSync(password, saltRounds);
+    var hashedPassword = bcrypt.hashSync(plainPassword, saltRounds);
     return hashedPassword;
 }
 
