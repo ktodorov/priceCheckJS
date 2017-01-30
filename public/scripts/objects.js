@@ -1,3 +1,49 @@
+$(document).ready(function() {
+    var lastCheckedObjects = $("td[data-property='lastChecked']");
+    lastCheckedObjects.each(function(index) {
+        var dataValue = $(this).attr("data-value");
+        var formattedDataValue = formatDate(new Date(dataValue));
+        $(this).text(formattedDataValue);
+    }, this);
+
+
+    var productRows = $(".productRow");
+    productRows.each(function(index, productRow) {
+        refreshProductPrice(productRow);
+    });
+})
+
+function refreshProductPrice(productRow) {
+    var oldPriceColumn = $(productRow).find("td[data-property='oldPrice']");
+    var newPriceColumn = $(productRow).find("td[data-property='newPrice']");
+    var priceColumn = $(productRow).find("td[data-property='price']");
+    var priceDifferenceColumn = $(productRow).find("td[data-property='priceDifference']");
+
+    if (oldPriceColumn.text() != newPriceColumn.text()) {
+        priceColumn.hide();
+        oldPriceColumn.show();
+        newPriceColumn.show();
+        priceDifferenceColumn.show();
+
+        var oldPrice = parseFloat(oldPriceColumn.text());
+        var newPrice = parseFloat(newPriceColumn.text());
+        if (newPrice > oldPrice) {
+            priceDifferenceColumn.find("i.price-up").show();
+            priceDifferenceColumn.find("i.price-down").hide();
+        } else {
+            priceDifferenceColumn.find("i.price-up").hide();
+            priceDifferenceColumn.find("i.price-down").show();
+        }
+
+        priceDifferenceColumn.find("span.price-difference-span").text(newPrice - oldPrice);
+    } else {
+        priceColumn.show();
+        oldPriceColumn.hide();
+        newPriceColumn.hide();
+        priceDifferenceColumn.hide();
+    }
+}
+
 function getObjectPrice(id) {
     $.ajax({
         type: 'GET',
@@ -107,15 +153,6 @@ function formatDate(date) {
         date.getFullYear() + " " + ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
 }
 
-$(document).ready(function() {
-    var lastCheckedObjects = $("td[data-property='lastChecked']");
-    lastCheckedObjects.each(function(index) {
-        var dataValue = $(this).attr("data-value");
-        var formattedDataValue = formatDate(new Date(dataValue));
-        $(this).text(formattedDataValue);
-    }, this);
-})
-
 function refreshProduct(button, productId) {
     $.ajax({
         url: "/refreshProduct",
@@ -128,8 +165,12 @@ function refreshProduct(button, productId) {
             if (!updatedProduct) {
                 return;
             }
-            $(button).closest("tr").find("td[data-property='name']").text(updatedProduct.name);
-            $(button).closest("tr").find("td[data-property='lastChecked']").text(formatDate(new Date(updatedProduct.lastChecked)));
+            var productRow = $(button).closest("tr.productRow");
+            productRow.find("td[data-property='name']").text(updatedProduct.name);
+            productRow.find("td[data-property='lastChecked']").text(formatDate(new Date(updatedProduct.lastChecked)));
+            productRow.find("td[data-property='newPrice']").text(updatedProduct.newPrice);
+
+            refreshProductPrice(productRow);
         }
     });
 }

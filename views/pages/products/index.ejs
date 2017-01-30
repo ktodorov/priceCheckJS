@@ -44,25 +44,21 @@
             </tr>
             <% if (objectslist && objectslist.length > 0) { %>
                 <% for(var i=0; i < objectslist.length; i++) { %>
-                    <tr object-id='<%= objectslist[i]._id %>'>
+                    <tr class='productRow' object-id='<%= objectslist[i]._id %>'>
                         <td style='text-align: center;' data-property='image'><img src='<%= objectslist[i].imageUrl %>' alt='objectslist[i].name '/></td>
                         <td class='left-aligned' data-property='name'><%= objectslist[i].name %></td>
-                        <% if (objectslist[i].newPrice - objectslist[i].oldPrice != 0) { %>
-                            <td data-property='newPrice' style='font-weight: bold'><%= objectslist[i].newPrice %></td>
-                            <td data-property='oldPrice'><%= objectslist[i].oldPrice %></td>
-                            <td data-property='priceDifference'>
-                                <span style='color: red; font-weight: bold;'>
-                                    <% if (objectslist[i].newPrice - objectslist[i].oldPrice > 0) { %>
-                                        <i class="fa fa-angle-up" aria-hidden="true"></i>
-                                    <% } else { %>
-                                        <i class="fa fa-angle-down" aria-hidden="true"></i>
-                                    <% } %>
-                                    <%= objectslist[i].newPrice - objectslist[i].oldPrice %>
-                                </span>
-                            </td>
-                        <% } else { %>
-                            <td data-property='price' colspan='3'><%= objectslist[i].newPrice %></td>
-                        <% } %>
+                        <!-- Price columns -->
+                        <td data-property='newPrice' style='font-weight: bold; display: none;'><%= objectslist[i].newPrice %></td>
+                        <td data-property='oldPrice' style='display:none;'><%= objectslist[i].oldPrice %></td>
+                        <td data-property='priceDifference' style='display:none;'>
+                            <span style='color: red; font-weight: bold;'>
+                                <i class="fa fa-angle-up price-up" aria-hidden="true" style='display:none;'></i>
+                                <i class="fa fa-angle-down price-down" aria-hidden="true" style='display:none;'></i>
+                                <span class='price-difference-span'></span>
+                            </span>
+                        </td>
+                        
+                        <td data-property='price' colspan='3' style='display:none;'><%= objectslist[i].newPrice %></td>
                         <td data-property='currency'><%= objectslist[i].currencySymbol %></td>
                         <td data-property='website'><a href='<%= objectslist[i].objectUrl %>'><%= objectslist[i].website %></a></td>
                         <td data-property='description'><%= objectslist[i].description %></td>
