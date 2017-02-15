@@ -161,7 +161,6 @@ function refreshProduct(button, productId) {
         },
         type: "GET",
         success: function(updatedProduct) {
-            debugger;
             if (!updatedProduct) {
                 return;
             }
